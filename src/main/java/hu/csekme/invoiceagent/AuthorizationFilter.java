@@ -52,7 +52,6 @@ public class AuthorizationFilter implements Filter {
         res.setHeader("Pragma", "no-cache"); // HTTP 1.0.
         res.setDateHeader("Expires", 0); // Proxies.
       }
-      logger.warning("resource request" + req.getRequestURI());
       chain.doFilter(request, response); // továbbítjuk a kérést
     } else if (ajaxRequest) {
       try {

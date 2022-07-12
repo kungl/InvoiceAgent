@@ -9,6 +9,7 @@ import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.Serializable;
+import java.util.logging.Logger;
 
 /**
  * Access control bean
@@ -17,6 +18,8 @@ import java.io.Serializable;
 @Named
 @RequestScoped
 public class LoginBean implements Serializable {
+
+  private static final Logger logger = Logger.getLogger(LoginBean.class.getName());
 
   @Inject
   InvoiceAgent agent;
@@ -29,7 +32,8 @@ public class LoginBean implements Serializable {
    * @return redirect to index page
    */
   public String login() {
-    if (key!=null) {
+    if (!key.isEmpty()) {
+      logger.info(key);
       agent.setKey(key);
       getSession().setAttribute(AuthorizationFilter.COOKIE_INVOICE_AGENT, agent);
     }

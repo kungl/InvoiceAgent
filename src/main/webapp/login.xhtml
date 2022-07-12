@@ -25,11 +25,15 @@
                         <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
                             <h:form>
                                 <div class="form-outline mb-4">
-                                    <h:inputText a:placeholder="Számla Agent kulcs" styleClass="form-control"
+                                    <h:inputText id="key" required="true"
+                                                 requiredMessage="A számla agent kulcs megadása kötelező."
+                                                 a:placeholder="Számla Agent kulcs" styleClass="form-control"
                                                  value="#{loginBean.key}"/>
+                                    <h:message for="key" style="color:red"/>
                                 </div>
                                 <h:commandButton styleClass="btn btn-primary shadow" value="Belépés"
                                                  action="#{loginBean.login}"/>
+
                             </h:form>
                         </div>
                     </div>
