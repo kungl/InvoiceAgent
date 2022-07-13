@@ -1,5 +1,6 @@
 package hu.csekme.httphelper;
 
+
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -13,6 +14,7 @@ import java.util.*;
 import java.util.logging.Logger;
 
 public class Poster {
+  private static final String COOKIES_HEADER = "JSESSIONID";
   private static final Logger logger = Logger.getLogger(Poster.class.getName());
   private static final String LF = "\r\n";
   private final String boundary;
@@ -20,11 +22,14 @@ public class Poster {
   private final List<FormField> fields;
   private final List<FileField> files;
   private final Map<String, String> headers;
-
   private HttpURLConnection connection;
   private OutputStream outputStream;
-  private PrintWriter writer;
+ // private PrintWriter writer;
+  private static CookieManager cookieManager = new CookieManager();
 
+  static {
+    CookieHandler.setDefault(cookieManager);
+  }
 
   private Poster(Builder builder) {
     this.boundary = builder.boundary;
@@ -60,33 +65,28 @@ public class Poster {
   }
 
   public Response connect(RequestMethod method) {
+    System.setProperty("javax.net.debug","all");
     logger.info("connect");
     Response response = new Response();
     try {
       URL url = new URL(this.url);
       SSL();
-      CookieHandler.setDefault(new CookieManager(null, CookiePolicy.ACCEPT_ALL));
       this.connection = (HttpURLConnection) url.openConnection();
-      List<String> cookies = connection.getHeaderFields().get("Set-Cookie");
-      connection = (HttpURLConnection) new URL(this.url).openConnection();
-      for (String cookie : cookies) {
-        connection.addRequestProperty("Cookie", cookie.split(";", 2)[0]);
-      }
-      connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36"); // Do as if you're using Chrome 41 on Windows 7.
-      this.connection.setUseCaches(true);
-      this.connection.setDoInput(true);
+      this.connection.setRequestProperty("Connection", "Keep-Alive");
       if (method == RequestMethod.POST) {
         this.connection.setDoOutput(true);
+        this.connection.setRequestMethod("POST");
       }
       connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + this.boundary);
+      connection.setRequestProperty("Cookie", "JSESSIONID=50CD404B3D03704EEBF2FE1C72932324.sas2");
       Iterator<String> it = headers.keySet().iterator();
       while (it.hasNext()) {
         String key = it.next();
         String value = headers.get(key);
         this.connection.setRequestProperty(key, value);
       }
-      this.outputStream = this.connection.getOutputStream();
-      writer = new PrintWriter(new OutputStreamWriter(outputStream, StandardCharsets.UTF_8), true);
+      this.outputStream = new BufferedOutputStream(connection.getOutputStream());
+      //writer = new PrintWriter(new OutputStreamWriter(this.outputStream, StandardCharsets.UTF_8), true);
 
       for (FormField field : fields) {
         addFormField(field);
@@ -96,15 +96,44 @@ public class Poster {
         addFilePart(field);
       }
 
-      writer.flush();
-      writer.append("--");
-      writer.append(boundary);
-      writer.append("--");
-      writer.append(LF);
-      writer.close();
+      this.outputStream.write(boundary.getBytes(StandardCharsets.UTF_8));
+      this.outputStream.write(LF.getBytes(StandardCharsets.UTF_8));
+
+
+
+      File file = new File("cookie.file");
+      System.err.println(file.getAbsolutePath());
+      //Cookie
+      List<String> cookies = connection.getHeaderFields().get(COOKIES_HEADER);
+      cookies = connection.getHeaderFields().get(COOKIES_HEADER);
+      if (cookies != null) {
+        for (String cookie : cookies) {
+          cookieManager.getCookieStore().add(null, HttpCookie.parse(cookie).get(0));
+        }
+        StringBuilder stringCookies = new StringBuilder();
+        if (cookieManager.getCookieStore().getCookies().size() > 0) {
+          for (HttpCookie cookie : cookieManager.getCookieStore().getCookies()) {
+            stringCookies.append(cookie.getName()).append("=").append(cookie.getValue()).append(";");
+          }
+
+          ObjectOutput out = new ObjectOutputStream(new FileOutputStream(file));
+          out.writeObject(cookieManager.getCookieStore().getCookies());
+        }
+        // System.err.println("Cookie:" + stringCookies.toString());
+        //  connection.setRequestProperty("Cookie", stringCookies.toString());
+      }
+      //Cookie
+
+      this.outputStream.flush();
 
       response.code = this.connection.getResponseCode();
       response.stream = new ByteArrayOutputStream();
+
+      connection.getHeaderFields().forEach((key,value)->{
+        System.err.println(key + "=" + value);
+      });
+
+
       byte[] buffer = new byte[1024];
       int length;
       while ((length = this.connection.getInputStream().read(buffer)) != -1) {
@@ -121,34 +150,36 @@ public class Poster {
   }
 
 
-  private void addFormField(FormField field) {
-    writer.append("--");
-    writer.append(boundary);
-    writer.append(LF);
-    writer.append("Content-Disposition: form-data; name=\"" + field.getName() + "\"");
-    writer.append(LF);
-    writer.append(String.format("Content-Type: %s; charset=%s", field.getContentType(), StandardCharsets.UTF_8));
-    writer.append(LF);
-    writer.append(field.getValue().toString());
-    writer.append(LF);
-    writer.flush();
+  private void addFormField(FormField field) throws IOException {
+    this.outputStream.write("--".getBytes(StandardCharsets.UTF_8));
+    this.outputStream.write(boundary.getBytes(StandardCharsets.UTF_8));
+    this.outputStream.write(LF.getBytes(StandardCharsets.UTF_8));
+    this.outputStream.write(("Content-Disposition: form-data; name=\"" + field.getName() + "\"").getBytes(StandardCharsets.UTF_8));
+    this.outputStream.write(LF.getBytes(StandardCharsets.UTF_8));
+    this.outputStream.write(String.format("Content-Type: %s; charset=%s", field.getContentType(), StandardCharsets.UTF_8).getBytes(StandardCharsets.UTF_8));
+    this.outputStream.write(LF.getBytes(StandardCharsets.UTF_8));
+    this.outputStream.write(LF.getBytes(StandardCharsets.UTF_8));
+    this.outputStream.write(field.getValue().toString().getBytes(StandardCharsets.UTF_8));
+    this.outputStream.write(LF.getBytes(StandardCharsets.UTF_8));
+    this.outputStream.write("--".getBytes(StandardCharsets.UTF_8));
+    this.outputStream.write(boundary.getBytes(StandardCharsets.UTF_8));
+    this.outputStream.write("--".getBytes(StandardCharsets.UTF_8));
+    this.outputStream.write(LF.getBytes(StandardCharsets.UTF_8));
   }
 
   private void addFilePart(FileField fileField) throws Exception {
     String fileName = fileField.getFile().getName();
-    writer.append("--");
-    writer.append(boundary);
-    writer.append(LF);
-    writer.append("Content-Disposition: form-data; name=\"" + fileField.getFieldName() + "\"; filename=\"" + fileName + "\"");
-    writer.append(LF);
-    writer.append("Content-Type: file");// + URLConnection.guessContentTypeFromName(fileName));
-    writer.append(LF);
-    writer.append("Content-Transfer-Encoding: binary");
-    writer.append(LF);
-    writer.append(LF);
-    writer.flush();
+    this.outputStream.write("--".getBytes(StandardCharsets.UTF_8));
+    this.outputStream.write(boundary.getBytes(StandardCharsets.UTF_8));
+    this.outputStream.write(LF.getBytes(StandardCharsets.UTF_8));
+    this.outputStream.write(("Content-Disposition: form-data; name=\"" + fileField.getFieldName() + "\"; filename=\"" + fileName + "\"").getBytes(StandardCharsets.UTF_8));
+    this.outputStream.write(LF.getBytes(StandardCharsets.UTF_8));
+    this.outputStream.write("Content-Type: text/xml".getBytes(StandardCharsets.UTF_8));// + URLConnection.guessContentTypeFromName(fileName));
+    this.outputStream.write(LF.getBytes(StandardCharsets.UTF_8));
+    this.outputStream.write(LF.getBytes(StandardCharsets.UTF_8));
 
     FileInputStream inputStream = new FileInputStream(fileField.getFile());
+
     byte[] buffer = new byte[4096];
     int bytesRead = -1;
     while ((bytesRead = inputStream.read(buffer)) != -1) {
@@ -156,8 +187,11 @@ public class Poster {
     }
     outputStream.flush();
     inputStream.close();
-    writer.append(LF);
-    writer.flush();
+    this.outputStream.write(LF.getBytes(StandardCharsets.UTF_8));
+    this.outputStream.write("--".getBytes(StandardCharsets.UTF_8));
+    this.outputStream.write(boundary.getBytes(StandardCharsets.UTF_8));
+    this.outputStream.write("--".getBytes(StandardCharsets.UTF_8));
+    this.outputStream.write(LF.getBytes(StandardCharsets.UTF_8));
   }
 
 
