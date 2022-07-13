@@ -5,54 +5,106 @@ import java.rmi.server.UID;
 public class ReceiptEntry {
   //ID
   String uuid;
-  //Name
-  String name;
-  //Item quantity
-  Double quantity;
-  //Unit of quantity
-  String unit;
-  //Net Unit Price
-  String netUnitPrice;
+  // tétel megnevezés
+  String entryName;
+  // tétel mennyiség
+  Double entryQuantity;
+  // tétel mennyiségi egység
+  String entryUnit;
+  // tétel nettó egységár
+  Double entryNetUnitPrice;
+  // tétel nettó
+  Double entryNet;
+  // tétel áfakulcs
+  String entryVatKey;
+  // tétel áfa
+  Double entryVat;
+  // tétel bruttó
+  Double entryGross;
 
   public ReceiptEntry() {
   }
 
-  public ReceiptEntry(String name, Double quantity, String unit, String netUnitPrice) {
-    this.name = name;
-    this.quantity = quantity;
-    this.unit = unit;
-    this.netUnitPrice = netUnitPrice;
+  public ReceiptEntry(String entryName, Double entryQuantity, String entryUnit, Double entryNetUnitPrice, Double entryNet, String entryVatKey, Double entryVat, Double entryGross) {
+    this.entryName = entryName;
+    this.entryQuantity = entryQuantity;
+    this.entryUnit = entryUnit;
+    this.entryNetUnitPrice = entryNetUnitPrice;
+    this.entryNet = entryNet;
+    this.entryVatKey = entryVatKey;
+    this.entryVat = entryVat;
+    this.entryGross = entryGross;
   }
 
-  public String getName() {
-    return name;
+  public String getUuid() {
+    return uuid;
   }
 
-  public void setName(String name) {
-    this.name = name;
+  public void setUuid(String uuid) {
+    this.uuid = uuid;
   }
 
-  public Double getQuantity() {
-    return quantity;
+  public String getEntryName() {
+    return entryName;
   }
 
-  public void setQuantity(Double quantity) {
-    this.quantity = quantity;
+  public void setEntryName(String entryName) {
+    this.entryName = entryName;
   }
 
-  public String getUnit() {
-    return unit;
+  public Double getEntryQuantity() {
+    return entryQuantity;
   }
 
-  public void setUnit(String unit) {
-    this.unit = unit;
+  public void setEntryQuantity(Double entryQuantity) {
+    this.entryQuantity = entryQuantity;
   }
 
-  public String getNetUnitPrice() {
-    return netUnitPrice;
+  public String getEntryUnit() {
+    return entryUnit;
   }
 
-  public void setNetUnitPrice(String netUnitPrice) {
-    this.netUnitPrice = netUnitPrice;
+  public void setEntryUnit(String entryUnit) {
+    this.entryUnit = entryUnit;
+  }
+
+  public Double getEntryNetUnitPrice() {
+    return entryNetUnitPrice;
+  }
+
+  public void setEntryNetUnitPrice(Double entryNetUnitPrice) {
+    this.entryNetUnitPrice = entryNetUnitPrice;
+  }
+
+  public Double getEntryNet() {
+    return entryNet;
+  }
+
+  public void setEntryNet(Double entryNet) {
+    this.entryNet = entryNet;
+  }
+
+  public String getEntryVatKey() {
+    return entryVatKey;
+  }
+
+  public void setEntryVatKey(String entryVatKey) {
+    this.entryVatKey = entryVatKey;
+  }
+
+  public Double getEntryVat() {
+    return entryVat;
+  }
+
+  public void setEntryVat(Double entryVat) {
+    this.entryVat = entryVat;
+  }
+
+  public Double getEntryGross() {
+    return entryGross;
+  }
+
+  public void setEntryGross(Double entryGross) {
+    this.entryGross = entryGross;
   }
 }

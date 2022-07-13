@@ -1,9 +1,4 @@
 package hu.csekme.invoiceagent.service;
-
-import hu.csekme.httphelper.ContentType;
-import hu.csekme.httphelper.Poster;
-import hu.csekme.httphelper.RequestMethod;
-import hu.csekme.httphelper.Response;
 import hu.szamlazz.xmlnyugtacreate.*;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;

@@ -6,9 +6,7 @@ import javax.annotation.PostConstruct;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * Receipt editor bean
@@ -29,32 +27,54 @@ public class ReceipeBean implements Serializable {
    * Ft, HUF, EUR, USD stb.
    */
   private List<String> currencies;
+  /**
+   * Normál: A,
+   * Keskeny: J,
+   * Keskeny, logóval: L
+   */
+  private Map<String, String> pdfTemplates;
 
   private String paymentMethod;
   private String prefix;
   private String currency;
+  private String pdfTemplate;
 
-  // Entriy
-  String entriyName;
-  //Item quantity
+  // tétel megnevezés
+  String entryName;
+  // tétel mennyiség
   Double entryQuantity;
-  //Unit of quantity
+  // tétel mennyiségi egység
   String entryUnit;
-  //Net Unit Price
-  String entryNetUnitPrice;
+  // tétel nettó egységár
+  Double entryNetUnitPrice;
+  // tétel nettó
+  Double entryNet;
+  // tétel áfakulcs
+  String entryVatKey;
+  // tétel áfa
+  Double entryVat;
+  // tétel bruttó
+  Double entryGross;
 
   List<ReceiptEntry> entries;
 
   @PostConstruct
   public void init() {
-    paymentMethods = new ArrayList<String>(Arrays.asList("átutalás,készpénz,bankkártya,csekk,utánvét,ajándékutalvány,barion,barter,csoportos beszedés,OTP Simple,kompenzáció,kupon,PayPal,PayU,SZÉP kártya,utalvány".split(",")));
-    currencies = new ArrayList<String>(Arrays.asList("Ft,HUF,EUR,USD".split(",")));
+    paymentMethods = new ArrayList<>(Arrays.asList("átutalás,készpénz,bankkártya,csekk,utánvét,ajándékutalvány,barion,barter,csoportos beszedés,OTP Simple,kompenzáció,kupon,PayPal,PayU,SZÉP kártya,utalvány".split(",")));
+    currencies = new ArrayList<>(Arrays.asList("Ft,HUF,EUR,USD".split(",")));
+    pdfTemplates = new LinkedHashMap<>();
     entries = new ArrayList<>();
+    pdfTemplates.put("Normál", "A");
+    pdfTemplates.put("Keskeny", "J");
+    pdfTemplates.put("Keskeny, logóval", "L");
   }
 
+  /**
+   * Add new entry
+   */
   public void addEntry() {
-    System.err.println(entriyName);
-    entries.add(new ReceiptEntry(entriyName, entryQuantity, entryUnit, entryNetUnitPrice));
+    System.err.println(pdfTemplate);
+    entries.add(new ReceiptEntry(entryName, entryQuantity, entryUnit, entryNetUnitPrice, entryNet, entryVatKey, entryVat, entryGross));
     System.err.println(entries.size());
   }
 
@@ -106,12 +126,12 @@ public class ReceipeBean implements Serializable {
     this.entries = entries;
   }
 
-  public String getEntriyName() {
-    return entriyName;
+  public String getEntryName() {
+    return entryName;
   }
 
-  public void setEntriyName(String entriyName) {
-    this.entriyName = entriyName;
+  public void setEntryName(String entryName) {
+    this.entryName = entryName;
   }
 
   public Double getEntryQuantity() {
@@ -130,11 +150,59 @@ public class ReceipeBean implements Serializable {
     this.entryUnit = entryUnit;
   }
 
-  public String getEntryNetUnitPrice() {
+  public Double getEntryNetUnitPrice() {
     return entryNetUnitPrice;
   }
 
-  public void setEntryNetUnitPrice(String entryNetUnitPrice) {
+  public void setEntryNetUnitPrice(Double entryNetUnitPrice) {
     this.entryNetUnitPrice = entryNetUnitPrice;
+  }
+
+  public Double getEntryNet() {
+    return entryNet;
+  }
+
+  public void setEntryNet(Double entryNet) {
+    this.entryNet = entryNet;
+  }
+
+  public String getEntryVatKey() {
+    return entryVatKey;
+  }
+
+  public void setEntryVatKey(String entryVatKey) {
+    this.entryVatKey = entryVatKey;
+  }
+
+  public Double getEntryVat() {
+    return entryVat;
+  }
+
+  public void setEntryVat(Double entryVat) {
+    this.entryVat = entryVat;
+  }
+
+  public Double getEntryGross() {
+    return entryGross;
+  }
+
+  public void setEntryGross(Double entryGross) {
+    this.entryGross = entryGross;
+  }
+
+  public Map<String, String> getPdfTemplates() {
+    return pdfTemplates;
+  }
+
+  public void setPdfTemplates(Map<String, String> pdfTemplates) {
+    this.pdfTemplates = pdfTemplates;
+  }
+
+  public String getPdfTemplate() {
+    return pdfTemplate;
+  }
+
+  public void setPdfTemplate(String pdfTemplate) {
+    this.pdfTemplate = pdfTemplate;
   }
 }
