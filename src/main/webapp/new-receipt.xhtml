@@ -6,6 +6,7 @@
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
+      xmlns:p="http://primefaces.org/ui"
 >
 <ui:composition template="/WEB-INF/include/template.xhtml">
     <ui:define name="head">
@@ -13,7 +14,7 @@
         <h:outputStylesheet name="css/index-page.css"/>
     </ui:define>
     <ui:define name="body">
-        <f:view>
+        <f:view contentType="text/html;charset=UTF-8" encoding="UTF-8">
             <!-- The sidebar -->
             <div class="sidebar">
                 <a href="index.xhtml">Kezdőlap</a>
@@ -24,10 +25,79 @@
 
             <!-- Page content -->
             <div class="content">
-                <h:form>
-                    <h:commandButton value="test" actionListener="#{receipeService.generate}"/>
-                </h:form>
+                <div class="p-5 mb-4 bg-light rounded-3">
+                    <div class="container-fluid py-5">
+                        <h1 class="display-5 fw-bold">Nyugta létrehozása</h1>
+                        <p class="col-md-12 fs-4">Töltse ki a mezőket adjon hozzá tételeket majd a nyugta létrehozás gombbal rögzítse a nyugtát.</p>
+                        <hr/>
+                        <h:form styleClass="row g-3">
+                            <div class="col-md-2">
+                                <h:outputLabel for="elotag" styleClass="form-label">Előtag</h:outputLabel>
+                                <h:inputText styleClass="form-control" id="elotag"/>
+                            </div>
+                            <div class="col-md-6">
+                                <h:outputLabel for="fizmod" styleClass="form-label">Fizetési mód</h:outputLabel>
+                                <h:selectOneMenu styleClass="form-select" id="fizmod"
+                                                 value="#{receipeBean.paymentMethod}">
+                                    <f:selectItems value="#{receipeBean.paymentMethods}"/>
+                                </h:selectOneMenu>
+                            </div>
+                            <div class="col-md-4">
+                                <h:outputLabel for="penznem" styleClass="form-label">Pénznem</h:outputLabel>
+                                <h:selectOneMenu styleClass="form-select" id="penznem" value="#{receipeBean.currency}">
+                                    <f:selectItems value="#{receipeBean.currencies}"/>
+                                </h:selectOneMenu>
+                            </div>
+
+
+
+                            <p:panel id="custom" header="Tételek">
+                                <p class="p-m-0">
+                                    <p:dataTable widgetVar="dtEntries" emptyMessage="Nincs még rögzítve tétel"
+                                                 var="entry"
+                                                 showGridlines="true"
+                                                 resizableColumns="true"
+                                                 value="#{receipeBean.entries}">
+                                        <p:column headerText="Megnevezés">
+                                            <h:outputText value="#{entry.name}"/>
+                                        </p:column>
+
+                                    </p:dataTable>
+                                </p>
+
+                                <f:facet name="actions">
+                                    <p:commandButton value="Új tétel" icon="pi pi-plus" onclick="PF('dlg1').show(); return false;"
+                                                     styleClass="ui-button-success" style="margin-right: .5rem">
+                                    </p:commandButton>
+                                </f:facet>
+                            </p:panel>
+
+
+
+                            <h:commandButton styleClass="btn btn-danger shadow" value="Nyugta létrehozása"
+                                             actionListener="#{receipeService.generate}"/>
+
+                            <p:dialog header="Tétel rögzítése" widgetVar="dlg1" minHeight="40" width="400"
+                                      showEffect="fade" modal="true">
+                                <p class="p-m-0">
+                                    <h:outputLabel styleClass="form-label">Tétel megnevezése</h:outputLabel>
+                                    <h:inputText styleClass="form-control"
+                                                 value="#{receipeBean.entriyName}"></h:inputText>
+                                    <f:facet name="footer">
+                                        <h:commandButton styleClass="btn btn-light shadow" value="Mégse"
+                                                         onclick="PF('dlg1').hide(); return false;"/>
+                                        <h:commandButton styleClass="btn btn-danger shadow" value="Rögzítés"
+                                                         actionListener="#{receipeBean.addEntry}"/>
+                                    </f:facet>
+                                </p>
+                            </p:dialog>
+
+                        </h:form>
+                    </div>
+                </div>
+
             </div>
+
         </f:view>
     </ui:define>
 </ui:composition>

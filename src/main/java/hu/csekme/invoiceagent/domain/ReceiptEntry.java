@@ -1,5 +1,7 @@
 package hu.csekme.invoiceagent.domain;
 
+import java.rmi.server.UID;
+
 public class ReceiptEntry {
   //ID
   String uuid;
@@ -11,6 +13,16 @@ public class ReceiptEntry {
   String unit;
   //Net Unit Price
   String netUnitPrice;
+
+  public ReceiptEntry() {
+  }
+
+  public ReceiptEntry(String name, Double quantity, String unit, String netUnitPrice) {
+    this.name = name;
+    this.quantity = quantity;
+    this.unit = unit;
+    this.netUnitPrice = netUnitPrice;
+  }
 
   public String getName() {
     return name;
