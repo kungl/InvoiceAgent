@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
+      xmlns:p="http://primefaces.org/ui"
+>
+<ui:composition template="/WEB-INF/include/template.xhtml">
+    <ui:define name="head">
+        <title>Invoice Agent Login</title>
+        <h:outputStylesheet name="css/index-page.css"/>
+    </ui:define>
+    <ui:define name="body">
+        <f:view encoding="UTF-8">
+            <!-- The sidebar -->
+            <div class="sidebar">
+                <a href="index.xhtml">Kezdőlap</a>
+                <a href="new-receipt.xhtml">Új nyugta</a>
+                <a class="active" href="receipts.xhtml">Nyugták</a>
+                <a href="#settings">Beállítások</a>
+            </div>
+
+            <!-- Page content -->
+            <div class="content">
+                <div class="p-5 mb-4 bg-light rounded-3">
+                    <div class="container-fluid py-5">
+                        <h1 class="display-5 fw-bold">Nyugták</h1>
+                        <p class="col-md-12 fs-4">Rögzített nyugták</p>
+                        <hr/>
+                        <h:form styleClass="row g-4" prependId="false" enctype="">
+                            <p class="p-m-0">
+                                <p:dataTable widgetVar="dtEntries" emptyMessage="Nincs még rögzítve tétel"
+                                             var="entry"
+                                             showGridlines="true"
+                                             resizableColumns="true"
+                                             rowSelectMode="add"
+                                             selection="#{receiptListBean.selected}"
+                                             rowKey="#{entry.nyugta.alap.nyugtaszam}"
+                                             value="#{receiptListBean.dao.receipts}">
+
+
+                                    <p:column headerText="Nyugtaszám">
+                                        <h:outputText value="#{entry.nyugta.alap.nyugtaszam}"/>
+                                    </p:column>
+
+                                    <p:column headerText="Fizetési mód">
+                                        <h:outputText value="#{entry.nyugta.alap.fizmod}">
+                                        </h:outputText>
+                                    </p:column>
+
+                                    <p:column headerText="Totál összeg">
+                                        <h:outputText value="#{entry.nyugta.osszegek.totalossz.brutto}"></h:outputText>
+                                    </p:column>
+
+                                    <p:column exportable="false">
+                                        <p:commandButton value="Nyugtakép" ajax="false" icon="pi pi-download"
+                                                         action="#{receiptListBean.download}"
+                                                         styleClass="rounded-button ui-button-success" process="@this">
+                                            <f:setPropertyActionListener value="#{entry}"
+                                                                         target="#{receiptListBean.selected}"/>
+                                            <f:ajax disabled="true"/>
+                                        </p:commandButton>
+                                    </p:column>
+
+                                </p:dataTable>
+                            </p>
+                        </h:form>
+                    </div>
+                </div>
+
+            </div>
+            <h:outputScript library="js" name="receipt-entry.js"/>
+        </f:view>
+    </ui:define>
+</ui:composition>
+</html>

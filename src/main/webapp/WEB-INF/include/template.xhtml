@@ -5,7 +5,7 @@
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
-      xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
+      xmlns:a="http://xmlns.jcp.org/jsf/passthrough" xmlns:p="http://primefaces.org/ui"
 >
 <h:head>
     <meta charset="utf-8"/>
@@ -27,10 +27,39 @@
           <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
         <![endif]-->
     </f:verbatim>
+    <style>
+        .ui-growl {
+            width: 90% !important;
+        }
+        .ui-growl-message {
+            width: 90% !important;
+        }
+        .ui-growl-message p {
+            white-space: normal !important;
+        }
+        @media screen and (min-width: 840px) {
+            .ui-growl {
+                width: 60% !important;
+            }
+        }
+        @media screen and (min-width: 1000px) {
+            .ui-growl {
+                width: 50% !important;
+            }
+        }
+        @media screen and (min-width: 1600px) {
+            .ui-growl {
+                width: 30% !important;
+            }
+        }
+    </style>
     <ui:insert name="head"/>
 </h:head>
 <h:body>
     <ui:insert name="body"/>
+
+    <p:growl id="growl" showDetail="true" sticky="true" />
+
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->

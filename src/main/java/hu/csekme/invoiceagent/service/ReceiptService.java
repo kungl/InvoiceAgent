@@ -1,51 +1,47 @@
 package hu.csekme.invoiceagent.service;
 import hu.csekme.invoiceagent.InvoiceAgent;
+import hu.csekme.invoiceagent.dao.XmlResponseDao;
 import hu.csekme.invoiceagent.domain.Receipt;
 import hu.csekme.invoiceagent.domain.ReceiptEntry;
 import hu.szamlazz.xmlnyugtacreate.*;
 import hu.szamlazz.xmlnyugtavalasz.Xmlnyugtavalasz;
-import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.config.Registry;
-import org.apache.http.config.RegistryBuilder;
-import org.apache.http.conn.socket.ConnectionSocketFactory;
-import org.apache.http.conn.socket.PlainConnectionSocketFactory;
-import org.apache.http.conn.ssl.NoopHostnameVerifier;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.TrustStrategy;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
-import org.apache.http.ssl.SSLContexts;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.net.ssl.SSLContext;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.Serializable;
-import java.io.StringReader;
-import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Receipt Management Service
+ * With the help of this service, we can overcome the calling xml.
+ * InvoiceAgent receives the assembled xml and provides an interface to szamlazz.hu
+ * The generated receipts are stored in the XmlResponseDao repository
+ * @see InvoiceAgent
+ * @see XmlResponseDao
+ */
 @Named
 @ApplicationScoped
 public class ReceiptService implements Serializable {
+
   private static final Logger logger = Logger.getLogger(ReceiptService.class.getName());
-  private static final String INVOICE_AGENT_API = "https://www.szamlazz.hu/szamla/";
 
   @Inject
   InvoiceAgent agent;
 
-  public void generate(Receipt receipt) {
-    logger.log(Level.INFO, "generate receipt {0}", new Object[]{receipt});
+  @Inject
+  XmlResponseDao dao;
+
+  /**
+   * Send a filled receipt from the UI to szamlazz.hu
+   * the successful receipt is stored in the dao
+   * @param receipt filled receipt from UI
+   * @return the receipt is returned to the UI for evaluation (error message)
+   */
+  public Xmlnyugtavalasz build(Receipt receipt) {
+    logger.log(Level.FINE, "generate receipt {0}", new Object[]{receipt});
     //settings
     ObjectFactory objectFactory = new ObjectFactory();
     BeallitasokTipus settings = objectFactory.createBeallitasokTipus();
@@ -53,6 +49,8 @@ public class ReceiptService implements Serializable {
     settings.setPdfLetoltes(true);
     //head
     FejlecTipus head = objectFactory.createFejlecTipus();
+    head.setHivasAzonosito(UUID.randomUUID().toString());
+    head.setPdfSablon(receipt.getPdfTemplate());
     head.setElotag(receipt.getPrefix());
     head.setFizmod(receipt.getPaymentMethod());
     head.setPenznem(receipt.getCurrency());
@@ -60,6 +58,7 @@ public class ReceiptService implements Serializable {
     head.setDevizaarf(0d);
     //entries
     TetelekTipus entries = objectFactory.createTetelekTipus();
+
     for (ReceiptEntry e : receipt.getReceiptEntryList()) {
       TetelTipus entry = objectFactory.createTetelTipus();
       entry.setMegnevezes(e.getEntryName());
@@ -78,71 +77,34 @@ public class ReceiptService implements Serializable {
     xml.setFejlec(head);
     xml.setTetelek(entries);
 
-    Xmlnyugtavalasz valasz =  createReceipt(xml);
-    if (valasz.isSikeres()) {
-      logger.info("siker");
-    } else {
-      logger.warning(valasz.toString());
+    Xmlnyugtavalasz response = dataExchange(xml);
+
+    //the successful receipt is stored in the dao
+    if (response.isSikeres()) {
+      dao.addReceipt(response);
     }
+    return response;
   }
 
-
-
-  public Xmlnyugtavalasz createReceipt(Xmlnyugtacreate xml) {
-    logger.info("generate");
+  /**
+   * data exchange with InvoiceAgent
+   * errors from InvoiceAgent are included in the receipt of error message and the error code 500 will be
+   * @param xml request xml
+   * @return response sml
+   */
+  private Xmlnyugtavalasz dataExchange(Xmlnyugtacreate xml) {
     try {
-
-      JAXBContext context = JAXBContext.newInstance(Xmlnyugtacreate.class);
-      Marshaller mar = context.createMarshaller();
-      mar.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-      String tempFilePath = String.format("%s%s%s.xml", System.getProperty("user.home"), System.getProperty("file.separator"), UUID.randomUUID().toString());
-      File file = new File(tempFilePath);
-      logger.log(Level.INFO, "temporary file {0}", new Object[]{tempFilePath});
-      file.deleteOnExit();
-      mar.marshal(xml, file);
-      TrustStrategy acceptingTrustStrategy = (cert, authType) -> true;
-      SSLContext sslContext = SSLContexts.custom().loadTrustMaterial(null, acceptingTrustStrategy).build();
-      SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslContext,
-              NoopHostnameVerifier.INSTANCE);
-
-      Registry<ConnectionSocketFactory> socketFactoryRegistry =
-              RegistryBuilder.<ConnectionSocketFactory> create()
-                      .register("https", sslsf)
-                      .register("http", new PlainConnectionSocketFactory())
-                      .build();
-
-      BasicHttpClientConnectionManager connectionManager =
-              new BasicHttpClientConnectionManager(socketFactoryRegistry);
-      CloseableHttpClient httpClient = HttpClients.custom().setSSLSocketFactory(sslsf)
-              .setConnectionManager(connectionManager).build();
-      HttpPost post = new HttpPost(INVOICE_AGENT_API);
-      MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-
-      builder.addBinaryBody("action-szamla_agent_nyugta_create", file);
-
-      HttpEntity multipart = builder.build();
-      post.setEntity(multipart);
-      CloseableHttpResponse response = httpClient.execute(post);
-      HttpEntity responseEntity = response.getEntity();
-      BufferedInputStream in = new BufferedInputStream(responseEntity.getContent());
-      byte[] contents = new byte[1024];
-
-      int bytesRead = 0;
-
-      StringBuilder sb = new StringBuilder();
-      while((bytesRead = in.read(contents)) != -1) {
-        sb.append(new String(contents, 0, bytesRead, StandardCharsets.UTF_8));
-      }
-
-      context = JAXBContext.newInstance(Xmlnyugtavalasz.class);
-      Unmarshaller jaxbUnmarshaller = context.createUnmarshaller();
-      StringReader reader = new StringReader(sb.toString());
-      return (Xmlnyugtavalasz)jaxbUnmarshaller.unmarshal(reader);
-
+       File file = InvoiceAgent.serialize(xml, true);
+       return agent.createReceipt(file);
     } catch (Exception e) {
+      Xmlnyugtavalasz xmlnyugtavalasz = new Xmlnyugtavalasz();
+      xmlnyugtavalasz.setSikeres(false);
+      xmlnyugtavalasz.setHibakod(500); //Internal server error
+      xmlnyugtavalasz.setHibauzenet(e.getMessage());
+      logger.severe(e.getMessage());
       e.printStackTrace();
+      return xmlnyugtavalasz;
     }
-    return null;
   }
 
 }

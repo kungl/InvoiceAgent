@@ -19,7 +19,7 @@
             <div class="sidebar">
                 <a href="index.xhtml">Kezdőlap</a>
                 <a class="active" href="new-receipt.xhtml">Új nyugta</a>
-                <a href="#reicipes">Nyugták</a>
+                <a href="receipts.xhtml">Nyugták</a>
                 <a href="#settings">Beállítások</a>
             </div>
 
@@ -33,7 +33,7 @@
                         <h:form styleClass="row g-4" prependId="false" enctype="">
                             <div class="col-md-3">
                                 <h:outputLabel for="elotag" styleClass="form-label">Előtag</h:outputLabel>
-                                <h:inputText styleClass="form-control" id="elotag"/>
+                                <h:inputText styleClass="form-control" id="elotag" value="#{receiptBean.receipt.prefix}"/>
                             </div>
                             <div class="col-md-3">
                                 <h:outputLabel for="fizmod" styleClass="form-label">Fizetési mód</h:outputLabel>
@@ -110,7 +110,7 @@
                                 </f:facet>
                             </p:panel>
 
-                            <h:commandButton  immediate="true" styleClass="btn btn-danger shadow" value="Nyugta" action="#{receiptBean.generateReceipt}"/>
+                            <h:commandButton styleClass="btn btn-danger shadow" value="Nyugta" action="#{receiptBean.generateReceipt}"/>
                              <!--
                             Nyugta tétel rögzítése dialógus
                             -->
@@ -119,25 +119,25 @@
                                 <div id="receipt-entry-fields" class="ui-fluid p-formgrid p-grid">
                                     <div class="p-field p-col">
                                         <label>Tétel megnevezése</label>
-                                        <p:inputText required="true"
+                                        <p:inputText class="required"
                                                 value="#{receiptBean.entryName}"></p:inputText>
                                     </div>
                                     <div class="p-field p-col">
                                         <label>Mennyiség</label>
-                                        <p:inputNumber required="true"
+                                        <p:inputNumber inputStyleClass="required"
                                                 value="#{receiptBean.entryQuantity}">
                                             <f:ajax event="keyup" listener="#{receiptBean.autoCalcEntryFields}" render="gross net vat" />
                                         </p:inputNumber>
                                     </div>
                                     <div class="p-field p-col">
-                                        <label>Mennyiségi egység</label>
-                                        <p:inputText required="true"
+                                        <label>Mennyiségi egység (darab, doboz, stb..)</label>
+                                        <p:inputText class="required"
                                                 value="#{receiptBean.entryUnit}">
                                         </p:inputText>
                                     </div>
                                     <div class="p-field p-col">
                                         <label>Nettó egységár</label>
-                                        <p:inputNumber required="true"
+                                        <p:inputNumber inputStyleClass="required"
                                                           value="#{receiptBean.entryNetUnitPrice}">
                                             <f:ajax event="keyup" listener="#{receiptBean.autoCalcEntryFields}" render="gross net vat" />
                                         </p:inputNumber>
@@ -150,7 +150,7 @@
                                     </div>
                                     <div class="p-field p-col">
                                         <label>Áfakulcs</label>
-                                        <p:inputText styleClass="readonly" readonly="true"
+                                        <p:inputText inputStyleClass="readonly" readonly="true"
                                                 value="#{receiptBean.entryVatKey}">
                                         </p:inputText>
                                     </div>

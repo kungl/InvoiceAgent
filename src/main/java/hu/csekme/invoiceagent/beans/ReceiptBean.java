@@ -3,8 +3,11 @@ package hu.csekme.invoiceagent.beans;
 import hu.csekme.invoiceagent.domain.Receipt;
 import hu.csekme.invoiceagent.domain.ReceiptEntry;
 import hu.csekme.invoiceagent.service.ReceiptService;
+import hu.szamlazz.xmlnyugtavalasz.Xmlnyugtavalasz;
 
 import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -84,7 +87,7 @@ public class ReceiptBean implements Serializable {
    * Calculate entry fields
    */
   public void autoCalcEntryFields() {
-    if (getEntryQuantity()!=null && getEntryNetUnitPrice()!=null) {
+    if (getEntryQuantity() != null && getEntryNetUnitPrice() != null) {
       setEntryNet(getEntryQuantity() * getEntryNetUnitPrice());
       setEntryVat(getEntryNet() * 0.27); // fix áfakulcs
       setEntryGross(getEntryNet() + getEntryVat());
@@ -95,8 +98,36 @@ public class ReceiptBean implements Serializable {
    * Generate receipt
    */
   public String generateReceipt() {
-    service.generate(receipt);
-    return "index.xhtml?faces-redirect=true";
+    //Fill receipt
+    if (validation()) {
+      Xmlnyugtavalasz valasz = service.build(receipt);
+      if (valasz.isSikeres()) {
+        addMessage(FacesMessage.SEVERITY_INFO, "Sikeres nyugta létrhozva",
+                String.format("Nyugta száma: %s",
+                        valasz.getNyugta().getAlap().getNyugtaszam()
+                )
+        );
+        return "receipts.xhtml?faces-redirect=true";
+      } else {
+        addMessage(FacesMessage.SEVERITY_ERROR, "Hiba történt", valasz.getHibauzenet());
+        return null;
+      }
+    }
+    return null;
+  }
+
+  public boolean validation() {
+    boolean valid = true;
+    if (receipt.getPrefix()==null || receipt.getPrefix().isEmpty()) {
+      valid = false;
+      addMessage(FacesMessage.SEVERITY_WARN, "Kötelező mező", "Az előtag kitöltése kötelező");
+    }
+    return valid;
+  }
+
+  public void addMessage(FacesMessage.Severity severity, String summary, String detail) {
+    FacesContext.getCurrentInstance().
+            addMessage(null, new FacesMessage(severity, summary, detail));
   }
 
   /**
@@ -106,9 +137,9 @@ public class ReceiptBean implements Serializable {
     this.entryGross = null;
     this.entryNet = null;
     this.entryName = null;
-    this.entryUnit = null;
+    this.entryUnit = "darab";
     this.entryNetUnitPrice = null;
-    this.entryVatKey = "27%";
+    this.entryVatKey = "27";
     this.entryVat = null;
     this.entryQuantity = null;
   }
@@ -216,4 +247,5 @@ public class ReceiptBean implements Serializable {
   public void setReceipt(Receipt receipt) {
     this.receipt = receipt;
   }
+
 }
