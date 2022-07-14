@@ -10,17 +10,18 @@
 >
 <ui:composition template="/WEB-INF/include/template.xhtml">
     <ui:define name="head">
-        <title>Invoice Agent Login</title>
+        <title>Invoice Agent | Nyugták</title>
         <h:outputStylesheet name="css/index-page.css"/>
     </ui:define>
     <ui:define name="body">
         <f:view encoding="UTF-8">
+
             <!-- The sidebar -->
             <div class="sidebar">
                 <a href="index.xhtml">Kezdőlap</a>
                 <a href="new-receipt.xhtml">Új nyugta</a>
                 <a class="active" href="receipts.xhtml">Nyugták</a>
-                <a href="#settings">Beállítások</a>
+                <a href="settings.xhtml">Beállítások</a>
             </div>
 
             <!-- Page content -->
@@ -30,7 +31,13 @@
                         <h1 class="display-5 fw-bold">Nyugták</h1>
                         <p class="col-md-12 fs-4">Rögzített nyugták</p>
                         <hr/>
+
                         <h:form styleClass="row g-4" prependId="false" enctype="">
+                            <div class="col-md-3">
+                                <h:outputLabel for="elotag" styleClass="form-label">Nyugtaszám</h:outputLabel>
+                                <h:inputText styleClass="form-control" id="elotag" value="#{receiptListBean.receiptNumber}"/>
+                                <p:commandButton ajax="false" value="Lekérés" actionListener="#{receiptListBean.get}"></p:commandButton>
+                            </div>
                             <p class="p-m-0">
                                 <p:dataTable widgetVar="dtEntries" emptyMessage="Nincs még rögzítve tétel"
                                              var="entry"

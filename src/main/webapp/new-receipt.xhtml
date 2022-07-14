@@ -10,17 +10,18 @@
 >
 <ui:composition template="/WEB-INF/include/template.xhtml">
     <ui:define name="head">
-        <title>Invoice Agent Login</title>
+        <title>Invoice Agent | Új nyugta</title>
         <h:outputStylesheet name="css/index-page.css"/>
     </ui:define>
     <ui:define name="body">
         <f:view encoding="UTF-8">
+
             <!-- The sidebar -->
             <div class="sidebar">
                 <a href="index.xhtml">Kezdőlap</a>
                 <a class="active" href="new-receipt.xhtml">Új nyugta</a>
                 <a href="receipts.xhtml">Nyugták</a>
-                <a href="#settings">Beállítások</a>
+                <a href="settings.xhtml">Beállítások</a>
             </div>
 
             <!-- Page content -->
@@ -110,7 +111,7 @@
                                 </f:facet>
                             </p:panel>
 
-                            <h:commandButton styleClass="btn btn-danger shadow" value="Nyugta" action="#{receiptBean.generateReceipt}"/>
+                            <h:commandButton styleClass="btn btn-danger shadow" value="Nyugta létrehozása" action="#{receiptBean.generateReceipt}"/>
                              <!--
                             Nyugta tétel rögzítése dialógus
                             -->

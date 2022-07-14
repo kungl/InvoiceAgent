@@ -7,15 +7,21 @@
     }
 }
 
+body {
+    background-color: #F8F9FA;
+}
+
 /* The side navigation menu */
 .sidebar {
     margin: 0;
     padding: 0;
     width: 200px;
-    background-color: #f1f1f1;
+    background-color: #F8F9FA;
     position: fixed;
     height: 100%;
     overflow: auto;
+
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px;
 }
 
 /* Sidebar links */

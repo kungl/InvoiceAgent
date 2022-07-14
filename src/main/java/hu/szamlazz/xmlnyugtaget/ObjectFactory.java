@@ -6,7 +6,7 @@
 //
 
 
-package hu.szamlazz.xmlnyugtacreate;
+package hu.szamlazz.xmlnyugtaget;
 
 import javax.xml.bind.annotation.XmlRegistry;
 
@@ -14,7 +14,7 @@ import javax.xml.bind.annotation.XmlRegistry;
 /**
  * This object contains factory methods for each 
  * Java content interface and Java element interface 
- * generated in the hu.szamlazz.xmlnyugtacreate package. 
+ * generated in the hu.szamlazz.xmlnyugtaget package. 
  * <p>An ObjectFactory allows you to programatically 
  * construct new instances of the Java representation 
  * for XML content. The Java representation of XML 
@@ -30,18 +30,18 @@ public class ObjectFactory {
 
 
     /**
-     * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: hu.szamlazz.xmlnyugtacreate
+     * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: hu.szamlazz.xmlnyugtaget
      * 
      */
     public ObjectFactory() {
     }
 
     /**
-     * Create an instance of {@link Xmlnyugtacreate }
+     * Create an instance of {@link Xmlnyugtaget }
      * 
      */
-    public Xmlnyugtacreate createXmlnyugtacreate() {
-        return new Xmlnyugtacreate();
+    public Xmlnyugtaget createXmlnyugtaget() {
+        return new Xmlnyugtaget();
     }
 
     /**
@@ -58,46 +58,6 @@ public class ObjectFactory {
      */
     public FejlecTipus createFejlecTipus() {
         return new FejlecTipus();
-    }
-
-    /**
-     * Create an instance of {@link TetelekTipus }
-     * 
-     */
-    public TetelekTipus createTetelekTipus() {
-        return new TetelekTipus();
-    }
-
-    /**
-     * Create an instance of {@link KifizetesekTipus }
-     * 
-     */
-    public KifizetesekTipus createKifizetesekTipus() {
-        return new KifizetesekTipus();
-    }
-
-    /**
-     * Create an instance of {@link TetelTipus }
-     * 
-     */
-    public TetelTipus createTetelTipus() {
-        return new TetelTipus();
-    }
-
-    /**
-     * Create an instance of {@link TetelFokonyvTipus }
-     * 
-     */
-    public TetelFokonyvTipus createTetelFokonyvTipus() {
-        return new TetelFokonyvTipus();
-    }
-
-    /**
-     * Create an instance of {@link KifizetesTipus }
-     * 
-     */
-    public KifizetesTipus createKifizetesTipus() {
-        return new KifizetesTipus();
     }
 
 }

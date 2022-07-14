@@ -5,26 +5,73 @@
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
-      xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
+      xmlns:a="http://xmlns.jcp.org/jsf/passthrough" xmlns:p="http://primefaces.org/ui"
 >
 <ui:composition template="/WEB-INF/include/template.xhtml">
     <ui:define name="head">
-        <title>Invoice Agent Login</title>
+        <title>Invoice Agent | Főoldal</title>
         <h:outputStylesheet name="css/index-page.css"/>
+        <style type="text/css">
+            .ui-panel, div.ui-state-hover {
+                margin: 10px;
+                width: 300px;
+            }
+
+            .ui-dashboard-column {
+                width: 320px;
+            }
+
+            .ui-panel .ui-panel-content {
+                text-align: center;
+            }
+        </style>
     </ui:define>
     <ui:define name="body">
         <f:view>
+
             <!-- The sidebar -->
             <div class="sidebar">
                 <a class="active" href="index.xhtml">Kezdőlap</a>
                 <a href="new-receipt.xhtml">Új nyugta</a>
                 <a href="receipts.xhtml">Nyugták</a>
-                <a href="#settings">Beállítások</a>
+                <a href="settings.xhtml">Beállítások</a>
             </div>
 
             <!-- Page content -->
             <div class="content">
-                ..
+                <div class="p-5 mb-4 bg-light rounded-3">
+                    <div class="container-fluid py-5">
+                        <h1 class="display-5 fw-bold">Kezdőoldal</h1>
+                        <p class="col-md-12 fs-4">Alkalmazás futására vonatkozó widgetek</p>
+                        <hr/>
+                        <h:form>
+
+                            <p:dashboard id="board" model="#{homeBean.model}">
+
+                                <p:panel id="success" header="Sikeresen generált nyugták">
+                                    <h:outputText style="font-size: xxx-large; color: forestgreen;" value="#{homeBean.numberOfSuccessGeneratedReceipt}"/>
+                                </p:panel>
+
+                                <p:panel id="failed" header="Hibásan generált nyugták">
+                                    <h:outputText style="font-size: xxx-large; color: red;" value="#{homeBean.numberOfFailedGeneratedReceipt}"/>
+                                </p:panel>
+
+                                <p:panel id="current" header="Jelenlegi generált nyugták">
+                                    <h:outputText style="font-size: xxx-large; color: darkslategrey;" value="#{homeBean.dao.receipts.size()}"/>
+                                </p:panel>
+
+                                <p:panel id="running" header="Szerver futása">
+                                    <h:outputText id="run" style="font-size: xx-large; color: darkslategrey;" value="#{homeBean.serverRunning} mp">
+                                    </h:outputText>
+                                    <p:poll autoStart="true" listener="#{homeBean.tick}" interval="1" update="run"/>
+                                </p:panel>
+
+                            </p:dashboard>
+
+                            <div style="clear:both"/>
+                        </h:form>
+                    </div>
+                </div>
             </div>
         </f:view>
     </ui:define>

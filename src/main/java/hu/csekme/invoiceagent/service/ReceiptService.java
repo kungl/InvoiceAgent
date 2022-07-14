@@ -1,9 +1,12 @@
 package hu.csekme.invoiceagent.service;
 import hu.csekme.invoiceagent.InvoiceAgent;
+import hu.csekme.invoiceagent.beans.HomeBean;
 import hu.csekme.invoiceagent.dao.XmlResponseDao;
 import hu.csekme.invoiceagent.domain.Receipt;
 import hu.csekme.invoiceagent.domain.ReceiptEntry;
+import hu.csekme.invoiceagent.enums.Action;
 import hu.szamlazz.xmlnyugtacreate.*;
+import hu.szamlazz.xmlnyugtaget.Xmlnyugtaget;
 import hu.szamlazz.xmlnyugtavalasz.Xmlnyugtavalasz;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -30,6 +33,9 @@ public class ReceiptService implements Serializable {
 
   @Inject
   InvoiceAgent agent;
+
+  @Inject
+  HomeBean home;
 
   @Inject
   XmlResponseDao dao;
@@ -77,11 +83,39 @@ public class ReceiptService implements Serializable {
     xml.setFejlec(head);
     xml.setTetelek(entries);
 
-    Xmlnyugtavalasz response = dataExchange(xml);
+    Xmlnyugtavalasz response = dataExchange(xml, Action.END_POINT_CREATE_RECEIPT);
 
     //the successful receipt is stored in the dao
     if (response.isSikeres()) {
+      home.increaseSuccessReceipt();
       dao.addReceipt(response);
+    } else {
+      home.increaseFailedReceipt();
+    }
+    return response;
+  }
+
+  /**
+   * Send a filled receipt from the UI to szamlazz.hu
+   * the successful receipt is stored in the dao
+   * @param receiptNumber
+   * @return
+   */
+  public Xmlnyugtavalasz build(String receiptNumber) {
+    Xmlnyugtaget xmlnyugtaget = new Xmlnyugtaget();
+    hu.szamlazz.xmlnyugtaget.ObjectFactory objectFactory = new hu.szamlazz.xmlnyugtaget.ObjectFactory();
+    hu.szamlazz.xmlnyugtaget.BeallitasokTipus settings = objectFactory.createBeallitasokTipus();
+    settings.setSzamlaagentkulcs(agent.getKey());
+    hu.szamlazz.xmlnyugtaget.FejlecTipus head = new hu.szamlazz.xmlnyugtaget.FejlecTipus();
+    head.setNyugtaszam(receiptNumber);
+    xmlnyugtaget.setBeallitasok(settings);
+    xmlnyugtaget.setFejlec(head);
+    Xmlnyugtavalasz response = dataExchange(xmlnyugtaget, Action.END_POINT_GET_RECEIPT);
+    if (response.isSikeres()) {
+      home.increaseSuccessReceipt();
+      dao.addReceipt(response);
+    } else {
+      home.increaseFailedReceipt();
     }
     return response;
   }
@@ -92,10 +126,22 @@ public class ReceiptService implements Serializable {
    * @param xml request xml
    * @return response sml
    */
-  private Xmlnyugtavalasz dataExchange(Xmlnyugtacreate xml) {
+  private Xmlnyugtavalasz dataExchange(Object xml, Action action) {
     try {
        File file = InvoiceAgent.serialize(xml, true);
-       return agent.createReceipt(file);
+       switch (action){
+         case END_POINT_CREATE_RECEIPT:
+           return agent.createReceipt(file);
+         case END_POINT_GET_RECEIPT:
+           return agent.getReceipt(file);
+         default:
+           Xmlnyugtavalasz xmlnyugtavalasz = new Xmlnyugtavalasz();
+           xmlnyugtavalasz.setSikeres(false);
+           xmlnyugtavalasz.setHibakod(500); //Internal server error
+           xmlnyugtavalasz.setHibauzenet("Nem implementált kérés");
+           return xmlnyugtavalasz;
+       }
+
     } catch (Exception e) {
       Xmlnyugtavalasz xmlnyugtavalasz = new Xmlnyugtavalasz();
       xmlnyugtavalasz.setSikeres(false);

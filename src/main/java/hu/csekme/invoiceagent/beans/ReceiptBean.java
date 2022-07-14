@@ -27,6 +27,9 @@ public class ReceiptBean implements Serializable {
   @Inject
   ReceiptService service;
 
+  @Inject
+  SettingsBean settingsBean;
+
   Receipt receipt;
 
   /**
@@ -73,6 +76,7 @@ public class ReceiptBean implements Serializable {
     pdfTemplates.put("Keskeny", "J");
     pdfTemplates.put("Keskeny, logóval", "L");
     clearEntryFields();
+    receipt.setPrefix(settingsBean.getDefaultReceiptPrefix());
   }
 
   /**

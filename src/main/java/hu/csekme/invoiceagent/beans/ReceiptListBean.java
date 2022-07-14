@@ -1,5 +1,6 @@
 package hu.csekme.invoiceagent.beans;
 import hu.csekme.invoiceagent.dao.XmlResponseDao;
+import hu.csekme.invoiceagent.service.ReceiptService;
 import hu.szamlazz.xmlnyugtavalasz.Xmlnyugtavalasz;
 import javax.enterprise.context.RequestScoped;
 import javax.faces.context.ExternalContext;
@@ -15,9 +16,18 @@ import java.util.Base64;
 public class ReceiptListBean {
 
   @Inject
+  ReceiptService service;
+
+  @Inject
   XmlResponseDao dao;
 
   Xmlnyugtavalasz selected;
+
+  String receiptNumber;
+
+  public void get() {
+    service.build(receiptNumber);
+  }
 
   /**
    * Download Receipe PDF
@@ -53,5 +63,13 @@ public class ReceiptListBean {
 
   public void setSelected(Xmlnyugtavalasz selected) {
     this.selected = selected;
+  }
+
+  public String getReceiptNumber() {
+    return receiptNumber;
+  }
+
+  public void setReceiptNumber(String receiptNumber) {
+    this.receiptNumber = receiptNumber;
   }
 }
