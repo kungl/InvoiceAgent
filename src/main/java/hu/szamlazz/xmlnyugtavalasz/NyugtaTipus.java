@@ -6,29 +6,28 @@
 //
 
 
-package hu.szamlazz.xmlnyugtacreate;
+package hu.szamlazz.xmlnyugtavalasz;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for anonymous complex type.
+ * <p>Java class for nyugtaTipus complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType&gt;
+ * &lt;complexType name="nyugtaTipus"&gt;
  *   &lt;complexContent&gt;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
  *       &lt;all&gt;
- *         &lt;element name="beallitasok" type="{http://www.szamlazz.hu/xmlnyugtacreate}beallitasokTipus"/&gt;
- *         &lt;element name="fejlec" type="{http://www.szamlazz.hu/xmlnyugtacreate}fejlecTipus"/&gt;
- *         &lt;element name="tetelek" type="{http://www.szamlazz.hu/xmlnyugtacreate}tetelekTipus"/&gt;
- *         &lt;element name="kifizetesek" type="{http://www.szamlazz.hu/xmlnyugtacreate}kifizetesekTipus" minOccurs="0"/&gt;
+ *         &lt;element name="alap" type="{http://www.szamlazz.hu/xmlnyugtavalasz}alapTipus"/&gt;
+ *         &lt;element name="tetelek" type="{http://www.szamlazz.hu/xmlnyugtavalasz}tetelekTipus"/&gt;
+ *         &lt;element name="kifizetesek" type="{http://www.szamlazz.hu/xmlnyugtavalasz}kifizetesekTipus" minOccurs="0"/&gt;
+ *         &lt;element name="osszegek" type="{http://www.szamlazz.hu/xmlnyugtavalasz}osszegekTipus"/&gt;
  *       &lt;/all&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
@@ -38,66 +37,41 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
+@XmlType(name = "nyugtaTipus", propOrder = {
 
 })
-@XmlRootElement(name = "xmlnyugtacreate")
-public class Xmlnyugtacreate {
+public class NyugtaTipus {
 
     @XmlElement(required = true)
-    protected BeallitasokTipus beallitasok;
-    @XmlElement(required = true)
-    protected FejlecTipus fejlec;
+    protected AlapTipus alap;
     @XmlElement(required = true)
     protected TetelekTipus tetelek;
     protected KifizetesekTipus kifizetesek;
+    @XmlElement(required = true)
+    protected OsszegekTipus osszegek;
 
     /**
-     * Gets the value of the beallitasok property.
+     * Gets the value of the alap property.
      * 
      * @return
      *     possible object is
-     *     {@link BeallitasokTipus }
+     *     {@link AlapTipus }
      *     
      */
-    public BeallitasokTipus getBeallitasok() {
-        return beallitasok;
+    public AlapTipus getAlap() {
+        return alap;
     }
 
     /**
-     * Sets the value of the beallitasok property.
+     * Sets the value of the alap property.
      * 
      * @param value
      *     allowed object is
-     *     {@link BeallitasokTipus }
+     *     {@link AlapTipus }
      *     
      */
-    public void setBeallitasok(BeallitasokTipus value) {
-        this.beallitasok = value;
-    }
-
-    /**
-     * Gets the value of the fejlec property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link FejlecTipus }
-     *     
-     */
-    public FejlecTipus getFejlec() {
-        return fejlec;
-    }
-
-    /**
-     * Sets the value of the fejlec property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link FejlecTipus }
-     *     
-     */
-    public void setFejlec(FejlecTipus value) {
-        this.fejlec = value;
+    public void setAlap(AlapTipus value) {
+        this.alap = value;
     }
 
     /**
@@ -146,6 +120,30 @@ public class Xmlnyugtacreate {
      */
     public void setKifizetesek(KifizetesekTipus value) {
         this.kifizetesek = value;
+    }
+
+    /**
+     * Gets the value of the osszegek property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link OsszegekTipus }
+     *     
+     */
+    public OsszegekTipus getOsszegek() {
+        return osszegek;
+    }
+
+    /**
+     * Sets the value of the osszegek property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link OsszegekTipus }
+     *     
+     */
+    public void setOsszegek(OsszegekTipus value) {
+        this.osszegek = value;
     }
 
 }

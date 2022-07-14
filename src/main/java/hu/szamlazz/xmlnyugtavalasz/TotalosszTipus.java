@@ -6,7 +6,7 @@
 //
 
 
-package hu.szamlazz.xmlnyugtacreate;
+package hu.szamlazz.xmlnyugtavalasz;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -14,17 +14,18 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for tetelFokonyvTipus complex type.
+ * <p>Java class for totalosszTipus complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType name="tetelFokonyvTipus"&gt;
+ * &lt;complexType name="totalosszTipus"&gt;
  *   &lt;complexContent&gt;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
  *       &lt;all&gt;
- *         &lt;element name="arbevetel" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/&gt;
- *         &lt;element name="afa" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/&gt;
+ *         &lt;element name="netto" type="{http://www.w3.org/2001/XMLSchema}double"/&gt;
+ *         &lt;element name="afa" type="{http://www.w3.org/2001/XMLSchema}double"/&gt;
+ *         &lt;element name="brutto" type="{http://www.w3.org/2001/XMLSchema}double"/&gt;
  *       &lt;/all&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
@@ -34,60 +35,61 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "tetelFokonyvTipus", propOrder = {
+@XmlType(name = "totalosszTipus", propOrder = {
 
 })
-public class TetelFokonyvTipus {
+public class TotalosszTipus {
 
-    protected String arbevetel;
-    protected String afa;
+    protected double netto;
+    protected double afa;
+    protected double brutto;
 
     /**
-     * Gets the value of the arbevetel property.
+     * Gets the value of the netto property.
      * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
-    public String getArbevetel() {
-        return arbevetel;
+    public double getNetto() {
+        return netto;
     }
 
     /**
-     * Sets the value of the arbevetel property.
+     * Sets the value of the netto property.
      * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
-    public void setArbevetel(String value) {
-        this.arbevetel = value;
+    public void setNetto(double value) {
+        this.netto = value;
     }
 
     /**
      * Gets the value of the afa property.
      * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
-    public String getAfa() {
+    public double getAfa() {
         return afa;
     }
 
     /**
      * Sets the value of the afa property.
      * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
-    public void setAfa(String value) {
+    public void setAfa(double value) {
         this.afa = value;
+    }
+
+    /**
+     * Gets the value of the brutto property.
+     * 
+     */
+    public double getBrutto() {
+        return brutto;
+    }
+
+    /**
+     * Sets the value of the brutto property.
+     * 
+     */
+    public void setBrutto(double value) {
+        this.brutto = value;
     }
 
 }

@@ -3,6 +3,7 @@ import hu.csekme.invoiceagent.InvoiceAgent;
 import hu.csekme.invoiceagent.domain.Receipt;
 import hu.csekme.invoiceagent.domain.ReceiptEntry;
 import hu.szamlazz.xmlnyugtacreate.*;
+import hu.szamlazz.xmlnyugtavalasz.Xmlnyugtavalasz;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -24,9 +25,11 @@ import javax.inject.Named;
 import javax.net.ssl.SSLContext;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.Serializable;
+import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -75,12 +78,17 @@ public class ReceiptService implements Serializable {
     xml.setFejlec(head);
     xml.setTetelek(entries);
 
-    createReceipt(xml);
+    Xmlnyugtavalasz valasz =  createReceipt(xml);
+    if (valasz.isSikeres()) {
+      logger.info("siker");
+    } else {
+      logger.warning(valasz.toString());
+    }
   }
 
 
 
-  public void createReceipt(Xmlnyugtacreate xml) {
+  public Xmlnyugtavalasz createReceipt(Xmlnyugtacreate xml) {
     logger.info("generate");
     try {
 
@@ -120,16 +128,21 @@ public class ReceiptService implements Serializable {
       byte[] contents = new byte[1024];
 
       int bytesRead = 0;
-      String strFileContents = "";
+
+      StringBuilder sb = new StringBuilder();
       while((bytesRead = in.read(contents)) != -1) {
-        strFileContents += new String(contents, 0, bytesRead, StandardCharsets.UTF_8);
+        sb.append(new String(contents, 0, bytesRead, StandardCharsets.UTF_8));
       }
 
-      System.out.print(strFileContents);
+      context = JAXBContext.newInstance(Xmlnyugtavalasz.class);
+      Unmarshaller jaxbUnmarshaller = context.createUnmarshaller();
+      StringReader reader = new StringReader(sb.toString());
+      return (Xmlnyugtavalasz)jaxbUnmarshaller.unmarshal(reader);
 
     } catch (Exception e) {
       e.printStackTrace();
     }
+    return null;
   }
 
 }

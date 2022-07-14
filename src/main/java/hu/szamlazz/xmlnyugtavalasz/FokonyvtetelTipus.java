@@ -6,7 +6,7 @@
 //
 
 
-package hu.szamlazz.xmlnyugtacreate;
+package hu.szamlazz.xmlnyugtavalasz;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -14,12 +14,12 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for tetelFokonyvTipus complex type.
+ * <p>Java class for fokonyvtetelTipus complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType name="tetelFokonyvTipus"&gt;
+ * &lt;complexType name="fokonyvtetelTipus"&gt;
  *   &lt;complexContent&gt;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
  *       &lt;all&gt;
@@ -34,10 +34,10 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "tetelFokonyvTipus", propOrder = {
+@XmlType(name = "fokonyvtetelTipus", propOrder = {
 
 })
-public class TetelFokonyvTipus {
+public class FokonyvtetelTipus {
 
     protected String arbevetel;
     protected String afa;

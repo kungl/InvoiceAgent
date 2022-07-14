@@ -6,11 +6,12 @@
 //
 
 
-package hu.szamlazz.xmlnyugtacreate;
+package hu.szamlazz.xmlnyugtavalasz;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 
 
@@ -26,14 +27,21 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;all&gt;
  *         &lt;element name="megnevezes" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
  *         &lt;element name="azonosito" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/&gt;
+ *         &lt;element name="nettoEgysegar" type="{http://www.w3.org/2001/XMLSchema}double"/&gt;
  *         &lt;element name="mennyiseg" type="{http://www.w3.org/2001/XMLSchema}double"/&gt;
  *         &lt;element name="mennyisegiEgyseg" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
- *         &lt;element name="nettoEgysegar" type="{http://www.w3.org/2001/XMLSchema}double"/&gt;
- *         &lt;element name="afakulcs" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
  *         &lt;element name="netto" type="{http://www.w3.org/2001/XMLSchema}double"/&gt;
+ *         &lt;element name="afatipus" type="{http://www.szamlazz.hu/xmlnyugtavalasz}afatipusTipus" minOccurs="0"/&gt;
+ *         &lt;element name="afakulcs"&gt;
+ *           &lt;simpleType&gt;
+ *             &lt;restriction base="{http://www.w3.org/2001/XMLSchema}int"&gt;
+ *               &lt;minInclusive value="0"/&gt;
+ *             &lt;/restriction&gt;
+ *           &lt;/simpleType&gt;
+ *         &lt;/element&gt;
  *         &lt;element name="afa" type="{http://www.w3.org/2001/XMLSchema}double"/&gt;
  *         &lt;element name="brutto" type="{http://www.w3.org/2001/XMLSchema}double"/&gt;
- *         &lt;element name="fokonyv" type="{http://www.szamlazz.hu/xmlnyugtacreate}tetelFokonyvTipus" minOccurs="0"/&gt;
+ *         &lt;element name="fokonyv" type="{http://www.szamlazz.hu/xmlnyugtavalasz}fokonyvtetelTipus" minOccurs="0"/&gt;
  *       &lt;/all&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
@@ -51,16 +59,17 @@ public class TetelTipus {
     @XmlElement(required = true)
     protected String megnevezes;
     protected String azonosito;
+    protected double nettoEgysegar;
     protected double mennyiseg;
     @XmlElement(required = true)
     protected String mennyisegiEgyseg;
-    protected double nettoEgysegar;
-    @XmlElement(required = true)
-    protected String afakulcs;
     protected double netto;
+    @XmlSchemaType(name = "string")
+    protected AfatipusTipus afatipus;
+    protected int afakulcs;
     protected double afa;
     protected double brutto;
-    protected TetelFokonyvTipus fokonyv;
+    protected FokonyvtetelTipus fokonyv;
 
     /**
      * Gets the value of the megnevezes property.
@@ -111,6 +120,22 @@ public class TetelTipus {
     }
 
     /**
+     * Gets the value of the nettoEgysegar property.
+     * 
+     */
+    public double getNettoEgysegar() {
+        return nettoEgysegar;
+    }
+
+    /**
+     * Sets the value of the nettoEgysegar property.
+     * 
+     */
+    public void setNettoEgysegar(double value) {
+        this.nettoEgysegar = value;
+    }
+
+    /**
      * Gets the value of the mennyiseg property.
      * 
      */
@@ -151,46 +176,6 @@ public class TetelTipus {
     }
 
     /**
-     * Gets the value of the nettoEgysegar property.
-     * 
-     */
-    public double getNettoEgysegar() {
-        return nettoEgysegar;
-    }
-
-    /**
-     * Sets the value of the nettoEgysegar property.
-     * 
-     */
-    public void setNettoEgysegar(double value) {
-        this.nettoEgysegar = value;
-    }
-
-    /**
-     * Gets the value of the afakulcs property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getAfakulcs() {
-        return afakulcs;
-    }
-
-    /**
-     * Sets the value of the afakulcs property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setAfakulcs(String value) {
-        this.afakulcs = value;
-    }
-
-    /**
      * Gets the value of the netto property.
      * 
      */
@@ -204,6 +189,46 @@ public class TetelTipus {
      */
     public void setNetto(double value) {
         this.netto = value;
+    }
+
+    /**
+     * Gets the value of the afatipus property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link AfatipusTipus }
+     *     
+     */
+    public AfatipusTipus getAfatipus() {
+        return afatipus;
+    }
+
+    /**
+     * Sets the value of the afatipus property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link AfatipusTipus }
+     *     
+     */
+    public void setAfatipus(AfatipusTipus value) {
+        this.afatipus = value;
+    }
+
+    /**
+     * Gets the value of the afakulcs property.
+     * 
+     */
+    public int getAfakulcs() {
+        return afakulcs;
+    }
+
+    /**
+     * Sets the value of the afakulcs property.
+     * 
+     */
+    public void setAfakulcs(int value) {
+        this.afakulcs = value;
     }
 
     /**
@@ -243,10 +268,10 @@ public class TetelTipus {
      * 
      * @return
      *     possible object is
-     *     {@link TetelFokonyvTipus }
+     *     {@link FokonyvtetelTipus }
      *     
      */
-    public TetelFokonyvTipus getFokonyv() {
+    public FokonyvtetelTipus getFokonyv() {
         return fokonyv;
     }
 
@@ -255,10 +280,10 @@ public class TetelTipus {
      * 
      * @param value
      *     allowed object is
-     *     {@link TetelFokonyvTipus }
+     *     {@link FokonyvtetelTipus }
      *     
      */
-    public void setFokonyv(TetelFokonyvTipus value) {
+    public void setFokonyv(FokonyvtetelTipus value) {
         this.fokonyv = value;
     }
 

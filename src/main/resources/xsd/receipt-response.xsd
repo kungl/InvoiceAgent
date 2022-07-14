@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://www.szamlazz.hu/xmlnyugtavalasz" targetNamespace="http://www.szamlazz.hu/xmlnyugtavalasz" elementFormDefault="qualified">
+    <simpleType name="afatipusTipus">
+        <restriction base="string">
+            <enumeration value="TAM"/>
+            <enumeration value="AAM"/>
+            <enumeration value="EU"/>
+            <enumeration value="EUK"/>
+            <enumeration value="MAA"/>
+            <enumeration value="F.AFA"/>
+            <enumeration value="K.AFA"/>
+            <enumeration value="ÁKK"/>
+            <enumeration value="TAHK"/>
+            <enumeration value="TEHK"/>
+            <enumeration value="EUT"/>
+            <enumeration value="EUKT"/>
+            <enumeration value="HO"/>
+            <enumeration value="EUE"/>
+            <enumeration value="EUFADE"/>
+            <enumeration value="EUFAD37"/>
+            <enumeration value="ATK"/>
+            <enumeration value="NAM"/>
+            <enumeration value="EAM"/>
+            <enumeration value="KBAUK"/>
+            <enumeration value="KBAET"/>
+        </restriction>
+    </simpleType>
+    <simpleType name="nyugtatipusTipus">
+        <restriction base="string">
+            <enumeration value="NY"/>
+            <!--  nyugta  -->
+            <enumeration value="SN"/>
+            <!--  nyugta sztornó  -->
+        </restriction>
+    </simpleType>
+    <!--  számla alapadatai  -->
+    <complexType name="alapTipus">
+        <all>
+            <element name="id" type="int" maxOccurs="1" minOccurs="1"/>
+            <element name="hivasAzonosito" type="string" maxOccurs="1" minOccurs="0"/>
+            <element name="nyugtaszam" type="string" maxOccurs="1" minOccurs="1"/>
+            <element name="tipus" type="tns:nyugtatipusTipus" maxOccurs="1" minOccurs="1"/>
+            <element name="stornozott" type="boolean" maxOccurs="1" minOccurs="1"/>
+            <element name="stornozottNyugtaszam" type="string" maxOccurs="1" minOccurs="0"/>
+            <element name="kelt" type="date" maxOccurs="1" minOccurs="1"/>
+            <element name="fizmod" type="string" maxOccurs="1" minOccurs="1"/>
+            <element name="penznem" type="string" maxOccurs="1" minOccurs="1"/>
+            <element name="devizabank" type="string" maxOccurs="1" minOccurs="0"/>
+            <element name="devizaarf" type="double" maxOccurs="1" minOccurs="0"/>
+            <element name="megjegyzes" type="string" maxOccurs="1" minOccurs="0"/>
+            <element name="fokonyvVevo" type="string" maxOccurs="1" minOccurs="0"/>
+            <element name="teszt" type="boolean" maxOccurs="1" minOccurs="1"/>
+        </all>
+    </complexType>
+    <!--  számla tételek  -->
+    <complexType name="fokonyvtetelTipus">
+        <all>
+            <element name="arbevetel" type="string" maxOccurs="1" minOccurs="0"/>
+            <element name="afa" type="string" maxOccurs="1" minOccurs="0"/>
+        </all>
+    </complexType>
+    <complexType name="tetelTipus">
+        <all>
+            <element name="megnevezes" type="string" maxOccurs="1" minOccurs="1"/>
+            <element name="azonosito" type="string" maxOccurs="1" minOccurs="0"/>
+            <element name="nettoEgysegar" type="double" maxOccurs="1" minOccurs="1"/>
+            <element name="mennyiseg" type="double" maxOccurs="1" minOccurs="1"/>
+            <element name="mennyisegiEgyseg" type="string" maxOccurs="1" minOccurs="1"/>
+            <element name="netto" type="double" maxOccurs="1" minOccurs="1"/>
+            <element name="afatipus" type="tns:afatipusTipus" maxOccurs="1" minOccurs="0"/>
+            <element name="afakulcs" maxOccurs="1" minOccurs="1">
+                <simpleType>
+                    <restriction base="int">
+                        <minInclusive value="0"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="afa" type="double" maxOccurs="1" minOccurs="1"/>
+            <element name="brutto" type="double" maxOccurs="1" minOccurs="1"/>
+            <element name="fokonyv" type="tns:fokonyvtetelTipus" maxOccurs="1" minOccurs="0"/>
+        </all>
+    </complexType>
+    <complexType name="tetelekTipus">
+        <sequence>
+            <element name="tetel" type="tns:tetelTipus" maxOccurs="unbounded" minOccurs="1"/>
+        </sequence>
+    </complexType>
+    <!--  áfakulcsonkénti összesítés  -->
+    <complexType name="afakulcsosszTipus">
+        <all>
+            <element name="afatipus" type="tns:afatipusTipus" maxOccurs="1" minOccurs="0"/>
+            <element name="afakulcs" maxOccurs="1" minOccurs="1">
+                <simpleType>
+                    <restriction base="int">
+                        <minInclusive value="0"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="netto" type="double" maxOccurs="1" minOccurs="1"/>
+            <element name="afa" type="double" maxOccurs="1" minOccurs="1"/>
+            <element name="brutto" type="double" maxOccurs="1" minOccurs="1"/>
+        </all>
+    </complexType>
+    <!--  számla teljes összesítés  -->
+    <complexType name="totalosszTipus">
+        <all>
+            <element name="netto" type="double" maxOccurs="1" minOccurs="1"/>
+            <element name="afa" type="double" maxOccurs="1" minOccurs="1"/>
+            <element name="brutto" type="double" maxOccurs="1" minOccurs="1"/>
+        </all>
+    </complexType>
+    <!--  számla összesítők (áfakulcsonként és total)  -->
+    <complexType name="osszegekTipus">
+        <sequence>
+            <element name="afakulcsossz" type="tns:afakulcsosszTipus" maxOccurs="unbounded" minOccurs="1"/>
+            <element name="totalossz" type="tns:totalosszTipus" maxOccurs="1" minOccurs="1"/>
+        </sequence>
+    </complexType>
+    <!--  jóváírások  -->
+    <complexType name="kifizetesTipus">
+        <all>
+            <element name="fizetoeszkoz" type="string" maxOccurs="1" minOccurs="1"/>
+            <element name="osszeg" type="double" maxOccurs="1" minOccurs="1"/>
+            <element name="leiras" type="string" maxOccurs="1" minOccurs="0"/>
+        </all>
+    </complexType>
+    <complexType name="kifizetesekTipus">
+        <sequence>
+            <element name="kifizetes" type="tns:kifizetesTipus" maxOccurs="unbounded" minOccurs="1"/>
+        </sequence>
+    </complexType>
+    <complexType name="nyugtaTipus">
+        <all>
+            <element name="alap" type="tns:alapTipus" maxOccurs="1" minOccurs="1"/>
+            <element name="tetelek" type="tns:tetelekTipus" maxOccurs="1" minOccurs="1"/>
+            <element name="kifizetesek" type="tns:kifizetesekTipus" maxOccurs="1" minOccurs="0"/>
+            <element name="osszegek" type="tns:osszegekTipus" maxOccurs="1" minOccurs="1"/>
+        </all>
+    </complexType>
+    <element name="xmlnyugtavalasz">
+        <complexType>
+            <all>
+                <element name="sikeres" type="boolean" maxOccurs="1" minOccurs="1"/>
+                <element name="hibakod" type="int" maxOccurs="1" minOccurs="0"/>
+                <element name="hibauzenet" type="string" maxOccurs="1" minOccurs="0"/>
+                <element name="nyugtaPdf" type="string" maxOccurs="1" minOccurs="0"/>
+                <element name="nyugta" type="tns:nyugtaTipus" maxOccurs="1" minOccurs="0"/>
+            </all>
+        </complexType>
+    </element>
+</schema>
