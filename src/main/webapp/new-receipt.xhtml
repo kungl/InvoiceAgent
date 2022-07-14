@@ -14,7 +14,7 @@
         <h:outputStylesheet name="css/index-page.css"/>
     </ui:define>
     <ui:define name="body">
-        <f:view contentType="text/html;charset=UTF-8" encoding="UTF-8">
+        <f:view encoding="UTF-8">
             <!-- The sidebar -->
             <div class="sidebar">
                 <a href="index.xhtml">Kezdőlap</a>
@@ -30,7 +30,7 @@
                         <h1 class="display-5 fw-bold">Nyugta létrehozása</h1>
                         <p class="col-md-12 fs-4">Töltse ki a mezőket adjon hozzá tételeket majd a nyugta létrehozás gombbal rögzítse a nyugtát.</p>
                         <hr/>
-                        <h:form styleClass="row g-4">
+                        <h:form styleClass="row g-4" prependId="false" enctype="">
                             <div class="col-md-3">
                                 <h:outputLabel for="elotag" styleClass="form-label">Előtag</h:outputLabel>
                                 <h:inputText styleClass="form-control" id="elotag"/>
@@ -38,21 +38,21 @@
                             <div class="col-md-3">
                                 <h:outputLabel for="fizmod" styleClass="form-label">Fizetési mód</h:outputLabel>
                                 <h:selectOneMenu styleClass="form-select" id="fizmod"
-                                                 value="#{receipeBean.paymentMethod}">
-                                    <f:selectItems value="#{receipeBean.paymentMethods}"/>
+                                                 value="#{receiptBean.receipt.paymentMethod}">
+                                    <f:selectItems value="#{receiptBean.paymentMethods}"/>
                                 </h:selectOneMenu>
                             </div>
                             <div class="col-md-3">
                                 <h:outputLabel for="penznem" styleClass="form-label">Pénznem</h:outputLabel>
-                                <h:selectOneMenu styleClass="form-select" id="penznem" value="#{receipeBean.currency}">
-                                    <f:selectItems value="#{receipeBean.currencies}"/>
+                                <h:selectOneMenu styleClass="form-select" id="penznem" value="#{receiptBean.receipt.currency}">
+                                    <f:selectItems value="#{receiptBean.currencies}"/>
                                 </h:selectOneMenu>
                             </div>
                             <div class="col-md-3">
                                 <h:outputLabel for="preview" styleClass="form-label">Nyugtakép</h:outputLabel>
                                 <h:selectOneMenu styleClass="form-select" id="preview"
-                                                 value="#{receipeBean.pdfTemplate}">
-                                    <f:selectItems value="#{receipeBean.pdfTemplates}"/>
+                                                 value="#{receiptBean.receipt.pdfTemplate}">
+                                    <f:selectItems value="#{receiptBean.pdfTemplates}"/>
                                 </h:selectOneMenu>
                             </div>
 
@@ -62,53 +62,119 @@
                                                  var="entry"
                                                  showGridlines="true"
                                                  resizableColumns="true"
-                                                 value="#{receipeBean.entries}">
+                                                 value="#{receiptBean.receipt.receiptEntryList}">
+
                                         <p:column headerText="Megnevezés">
                                             <h:outputText value="#{entry.entryName}"/>
                                         </p:column>
 
+                                        <p:column headerText="Mennyiség">
+                                            <h:outputText value="#{entry.entryQuantity}">
+                                                <f:convertNumber integerOnly="true"/>
+                                            </h:outputText>
+                                        </p:column>
+
+                                        <p:column headerText="Egységár">
+                                            <h:outputText value="#{entry.entryNetUnitPrice}">
+                                                <f:convertNumber integerOnly="true"/>
+                                            </h:outputText>
+                                        </p:column>
+
+                                        <p:column headerText="Egység">
+                                            <h:outputText value="#{entry.entryUnit}"/>
+                                        </p:column>
+
+                                        <p:column headerText="Áfakulcs">
+                                            <h:outputText value="#{entry.entryVatKey}"/>
+                                        </p:column>
+
+                                        <p:column headerText="Nettó">
+                                            <h:outputText value="#{entry.entryNet}">
+                                                <f:convertNumber integerOnly="true"/>
+                                            </h:outputText>
+                                        </p:column>
+
+                                        <p:column headerText="Bruttó">
+                                            <h:outputText value="#{entry.entryGross}">
+                                                <f:convertNumber integerOnly="true"/>
+                                            </h:outputText>
+                                        </p:column>
                                     </p:dataTable>
                                 </p>
 
                                 <f:facet name="actions">
                                     <p:commandButton value="Új tétel" icon="pi pi-plus"
-                                                     onclick="PF('dlg1').show(); return false;"
+                                                     onclick="PF('dlgEntry').show(); return false;"
                                                      styleClass="ui-button-success" style="margin-right: .5rem">
                                     </p:commandButton>
                                 </f:facet>
                             </p:panel>
 
-
-                            <h:commandButton styleClass="btn btn-danger shadow" value="Nyugta létrehozása"
-                                             actionListener="#{receipeService.generate}"/>
-
-                            <p:dialog header="Tétel rögzítése" widgetVar="dlg1" minHeight="40" width="400"
+                            <h:commandButton  immediate="true" styleClass="btn btn-danger shadow" value="Nyugta" action="#{receiptBean.generateReceipt}"/>
+                             <!--
+                            Nyugta tétel rögzítése dialógus
+                            -->
+                            <p:dialog header="Tétel rögzítése" widgetVar="dlgEntry" minHeight="40" width="400"
                                       showEffect="fade" modal="true">
-                                <div class="ui-fluid p-formgrid p-grid">
+                                <div id="receipt-entry-fields" class="ui-fluid p-formgrid p-grid">
                                     <div class="p-field p-col">
                                         <label>Tétel megnevezése</label>
-                                        <p:inputText
-                                                value="#{receipeBean.entryName}"></p:inputText>
+                                        <p:inputText required="true"
+                                                value="#{receiptBean.entryName}"></p:inputText>
                                     </div>
                                     <div class="p-field p-col">
                                         <label>Mennyiség</label>
-                                        <p:inputNumber
-                                                value="#{receipeBean.entryQuantity}">
+                                        <p:inputNumber required="true"
+                                                value="#{receiptBean.entryQuantity}">
+                                            <f:ajax event="keyup" listener="#{receiptBean.autoCalcEntryFields}" render="gross net vat" />
                                         </p:inputNumber>
                                     </div>
                                     <div class="p-field p-col">
                                         <label>Mennyiségi egység</label>
-                                        <p:inputText
-                                                value="#{receipeBean.entryUnit}"></p:inputText>
+                                        <p:inputText required="true"
+                                                value="#{receiptBean.entryUnit}">
+                                        </p:inputText>
+                                    </div>
+                                    <div class="p-field p-col">
+                                        <label>Nettó egységár</label>
+                                        <p:inputNumber required="true"
+                                                          value="#{receiptBean.entryNetUnitPrice}">
+                                            <f:ajax event="keyup" listener="#{receiptBean.autoCalcEntryFields}" render="gross net vat" />
+                                        </p:inputNumber>
+                                    </div>
+                                    <div class="p-field p-col">
+                                        <label>Nettó érték</label>
+                                        <p:inputNumber inputStyleClass="readonly" readonly="true" id="net"
+                                                value="#{receiptBean.entryNet}">
+                                        </p:inputNumber>
+                                    </div>
+                                    <div class="p-field p-col">
+                                        <label>Áfakulcs</label>
+                                        <p:inputText styleClass="readonly" readonly="true"
+                                                value="#{receiptBean.entryVatKey}">
+                                        </p:inputText>
+                                    </div>
+                                    <div class="p-field p-col">
+                                        <label>Áfa érték</label>
+                                        <p:inputNumber inputStyleClass="readonly" readonly="true" id="vat"
+                                                value="#{receiptBean.entryVat}">
+                                        </p:inputNumber>
+                                    </div>
+                                    <div class="p-field p-col">
+                                        <label>Bruttó érték</label>
+                                        <p:inputNumber  inputStyleClass="readonly" readonly="true" id="gross"
+                                                value="#{receiptBean.entryGross}">
+                                        </p:inputNumber>
                                     </div>
                                 </div>
                                     <f:facet name="footer">
                                         <h:commandButton styleClass="btn btn-light shadow" value="Mégse"
-                                                         onclick="PF('dlg1').hide(); return false;"/>
-                                        <h:commandButton styleClass="btn btn-danger shadow" value="Rögzítés"
-                                                         actionListener="#{receipeBean.addEntry}"/>
-                                    </f:facet>
+                                                         onclick="PF('dlgEntry').hide(); return false;"/>
 
+                                        <h:commandButton styleClass="btn btn-danger shadow" style="margin-left: 12px;" value="Rögzítés"
+                                                         onclick="return isFilled();"
+                                                         actionListener="#{receiptBean.addEntry}"/>
+                                    </f:facet>
                             </p:dialog>
 
                         </h:form>
@@ -116,8 +182,7 @@
                 </div>
 
             </div>
-
-
+            <h:outputScript library="js" name="receipt-entry.js"/>
         </f:view>
     </ui:define>
 </ui:composition>

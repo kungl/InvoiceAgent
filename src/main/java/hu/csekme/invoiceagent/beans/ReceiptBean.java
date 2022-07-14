@@ -1,9 +1,12 @@
 package hu.csekme.invoiceagent.beans;
 
+import hu.csekme.invoiceagent.domain.Receipt;
 import hu.csekme.invoiceagent.domain.ReceiptEntry;
+import hu.csekme.invoiceagent.service.ReceiptService;
 
 import javax.annotation.PostConstruct;
 import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.Serializable;
 import java.util.*;
@@ -16,7 +19,13 @@ import java.util.*;
  */
 @Named
 @ViewScoped
-public class ReceipeBean implements Serializable {
+public class ReceiptBean implements Serializable {
+
+  @Inject
+  ReceiptService service;
+
+  Receipt receipt;
+
   /**
    * átutalás, készpénz, bankkártya, csekk, utánvét, ajándékutalvány,
    * barion, barter, csoportos beszedés, OTP Simple,
@@ -33,11 +42,6 @@ public class ReceipeBean implements Serializable {
    * Keskeny, logóval: L
    */
   private Map<String, String> pdfTemplates;
-
-  private String paymentMethod;
-  private String prefix;
-  private String currency;
-  private String pdfTemplate;
 
   // tétel megnevezés
   String entryName;
@@ -56,26 +60,57 @@ public class ReceipeBean implements Serializable {
   // tétel bruttó
   Double entryGross;
 
-  List<ReceiptEntry> entries;
-
   @PostConstruct
   public void init() {
+    receipt = new Receipt();
     paymentMethods = new ArrayList<>(Arrays.asList("átutalás,készpénz,bankkártya,csekk,utánvét,ajándékutalvány,barion,barter,csoportos beszedés,OTP Simple,kompenzáció,kupon,PayPal,PayU,SZÉP kártya,utalvány".split(",")));
     currencies = new ArrayList<>(Arrays.asList("Ft,HUF,EUR,USD".split(",")));
     pdfTemplates = new LinkedHashMap<>();
-    entries = new ArrayList<>();
     pdfTemplates.put("Normál", "A");
     pdfTemplates.put("Keskeny", "J");
     pdfTemplates.put("Keskeny, logóval", "L");
+    clearEntryFields();
   }
 
   /**
    * Add new entry
    */
   public void addEntry() {
-    System.err.println(pdfTemplate);
-    entries.add(new ReceiptEntry(entryName, entryQuantity, entryUnit, entryNetUnitPrice, entryNet, entryVatKey, entryVat, entryGross));
-    System.err.println(entries.size());
+    receipt.addReceiptEntry(new ReceiptEntry(entryName, entryQuantity, entryUnit, entryNetUnitPrice, entryNet, entryVatKey, entryVat, entryGross));
+    clearEntryFields();
+  }
+
+  /**
+   * Calculate entry fields
+   */
+  public void autoCalcEntryFields() {
+    if (getEntryQuantity()!=null && getEntryNetUnitPrice()!=null) {
+      setEntryNet(getEntryQuantity() * getEntryNetUnitPrice());
+      setEntryVat(getEntryNet() * 0.27); // fix áfakulcs
+      setEntryGross(getEntryNet() + getEntryVat());
+    }
+  }
+
+  /**
+   * Generate receipt
+   */
+  public String generateReceipt() {
+    service.generate(receipt);
+    return "index.xhtml?faces-redirect=true";
+  }
+
+  /**
+   * Clear entry fields
+   */
+  private void clearEntryFields() {
+    this.entryGross = null;
+    this.entryNet = null;
+    this.entryName = null;
+    this.entryUnit = null;
+    this.entryNetUnitPrice = null;
+    this.entryVatKey = "27%";
+    this.entryVat = null;
+    this.entryQuantity = null;
   }
 
   public List<String> getPaymentMethods() {
@@ -92,38 +127,6 @@ public class ReceipeBean implements Serializable {
 
   public void setCurrencies(List<String> currencies) {
     this.currencies = currencies;
-  }
-
-  public String getPaymentMethod() {
-    return paymentMethod;
-  }
-
-  public void setPaymentMethod(String paymentMethod) {
-    this.paymentMethod = paymentMethod;
-  }
-
-  public String getPrefix() {
-    return prefix;
-  }
-
-  public void setPrefix(String prefix) {
-    this.prefix = prefix;
-  }
-
-  public String getCurrency() {
-    return currency;
-  }
-
-  public void setCurrency(String currency) {
-    this.currency = currency;
-  }
-
-  public List<ReceiptEntry> getEntries() {
-    return entries;
-  }
-
-  public void setEntries(List<ReceiptEntry> entries) {
-    this.entries = entries;
   }
 
   public String getEntryName() {
@@ -198,11 +201,19 @@ public class ReceipeBean implements Serializable {
     this.pdfTemplates = pdfTemplates;
   }
 
-  public String getPdfTemplate() {
-    return pdfTemplate;
+  public ReceiptService getService() {
+    return service;
   }
 
-  public void setPdfTemplate(String pdfTemplate) {
-    this.pdfTemplate = pdfTemplate;
+  public void setService(ReceiptService service) {
+    this.service = service;
+  }
+
+  public Receipt getReceipt() {
+    return receipt;
+  }
+
+  public void setReceipt(Receipt receipt) {
+    this.receipt = receipt;
   }
 }

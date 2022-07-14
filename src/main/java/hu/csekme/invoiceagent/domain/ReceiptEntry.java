@@ -107,4 +107,19 @@ public class ReceiptEntry {
   public void setEntryGross(Double entryGross) {
     this.entryGross = entryGross;
   }
+
+  @Override
+  public String toString() {
+    return "ReceiptEntry{" +
+            "uuid='" + uuid + '\'' +
+            ", entryName='" + entryName + '\'' +
+            ", entryQuantity=" + entryQuantity +
+            ", entryUnit='" + entryUnit + '\'' +
+            ", entryNetUnitPrice=" + entryNetUnitPrice +
+            ", entryNet=" + entryNet +
+            ", entryVatKey='" + entryVatKey + '\'' +
+            ", entryVat=" + entryVat +
+            ", entryGross=" + entryGross +
+            '}';
+  }
 }

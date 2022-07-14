@@ -63,3 +63,7 @@ div.content {
         float: none;
     }
 }
+
+.readonly {
+    background: #ffebc3 !important;
+}
