@@ -1,4 +1,5 @@
 package hu.csekme.invoiceagent.service;
+import hu.csekme.invoiceagent.InvoiceAgent;
 import hu.csekme.invoiceagent.domain.Receipt;
 import hu.csekme.invoiceagent.domain.ReceiptEntry;
 import hu.szamlazz.xmlnyugtacreate.*;
@@ -17,21 +18,17 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
 import org.apache.http.ssl.SSLContexts;
-import org.primefaces.shaded.commons.io.IOUtils;
-
-import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 import javax.inject.Named;
-import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
-import java.security.SecureRandom;
-import java.security.cert.X509Certificate;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -41,15 +38,15 @@ public class ReceiptService implements Serializable {
   private static final Logger logger = Logger.getLogger(ReceiptService.class.getName());
   private static final String INVOICE_AGENT_API = "https://www.szamlazz.hu/szamla/";
 
+  @Inject
+  InvoiceAgent agent;
 
   public void generate(Receipt receipt) {
     logger.log(Level.INFO, "generate receipt {0}", new Object[]{receipt});
     //settings
     ObjectFactory objectFactory = new ObjectFactory();
     BeallitasokTipus settings = objectFactory.createBeallitasokTipus();
-    settings.setFelhasznalo("csekme.krisztian@outlook.com");
-    settings.setJelszo("ssqN7Lq9q!AwAhefVn8q#");
-    settings.setSzamlaagentkulcs("z4dxiimpcqhb8m8fiimpcqj92dnviimpcqs2u3evii");
+    settings.setSzamlaagentkulcs(agent.getKey());
     settings.setPdfLetoltes(true);
     //head
     FejlecTipus head = objectFactory.createFejlecTipus();
@@ -90,10 +87,11 @@ public class ReceiptService implements Serializable {
       JAXBContext context = JAXBContext.newInstance(Xmlnyugtacreate.class);
       Marshaller mar = context.createMarshaller();
       mar.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-      ByteArrayOutputStream bo = new ByteArrayOutputStream();
-      mar.marshal(xml, bo);
-      bo.flush();
-
+      String tempFilePath = String.format("%s%s%s.xml", System.getProperty("user.home"), System.getProperty("file.separator"), UUID.randomUUID().toString());
+      File file = new File(tempFilePath);
+      logger.log(Level.INFO, "temporary file {0}", new Object[]{tempFilePath});
+      file.deleteOnExit();
+      mar.marshal(xml, file);
       TrustStrategy acceptingTrustStrategy = (cert, authType) -> true;
       SSLContext sslContext = SSLContexts.custom().loadTrustMaterial(null, acceptingTrustStrategy).build();
       SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslContext,
@@ -112,7 +110,7 @@ public class ReceiptService implements Serializable {
       HttpPost post = new HttpPost(INVOICE_AGENT_API);
       MultipartEntityBuilder builder = MultipartEntityBuilder.create();
 
-      builder.addBinaryBody("action-szamla_agent_nyugta_create", new BufferedInputStream(new ByteArrayInputStream(bo.toByteArray())));
+      builder.addBinaryBody("action-szamla_agent_nyugta_create", file);
 
       HttpEntity multipart = builder.build();
       post.setEntity(multipart);
