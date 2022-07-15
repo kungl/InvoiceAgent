@@ -1,13 +1,19 @@
 package hu.csekme.invoiceagent.service;
+
 import hu.csekme.invoiceagent.InvoiceAgent;
 import hu.csekme.invoiceagent.beans.HomeBean;
 import hu.csekme.invoiceagent.dao.XmlResponseDao;
 import hu.csekme.invoiceagent.domain.Receipt;
 import hu.csekme.invoiceagent.domain.ReceiptEntry;
+import hu.csekme.invoiceagent.domain.ReceiptSend;
 import hu.csekme.invoiceagent.enums.Action;
 import hu.szamlazz.xmlnyugtacreate.*;
 import hu.szamlazz.xmlnyugtaget.Xmlnyugtaget;
+import hu.szamlazz.xmlnyugtasend.EmailKuldes;
+import hu.szamlazz.xmlnyugtasend.Xmlnyugtasend;
+import hu.szamlazz.xmlnyugtasendvalasz.Xmlnyugtasendvalasz;
 import hu.szamlazz.xmlnyugtavalasz.Xmlnyugtavalasz;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -22,6 +28,7 @@ import java.util.logging.Logger;
  * With the help of this service, we can overcome the calling xml.
  * InvoiceAgent receives the assembled xml and provides an interface to szamlazz.hu
  * The generated receipts are stored in the XmlResponseDao repository
+ *
  * @see InvoiceAgent
  * @see XmlResponseDao
  */
@@ -43,6 +50,7 @@ public class ReceiptService implements Serializable {
   /**
    * Send a filled receipt from the UI to szamlazz.hu
    * the successful receipt is stored in the dao
+   *
    * @param receipt filled receipt from UI
    * @return the receipt is returned to the UI for evaluation (error message)
    */
@@ -83,7 +91,7 @@ public class ReceiptService implements Serializable {
     xml.setFejlec(head);
     xml.setTetelek(entries);
 
-    Xmlnyugtavalasz response = dataExchange(xml, Action.END_POINT_CREATE_RECEIPT);
+    Xmlnyugtavalasz response = dataExchange(xml, Action.END_POINT_CREATE_RECEIPT, Xmlnyugtavalasz.class);
 
     //the successful receipt is stored in the dao
     if (response.isSikeres()) {
@@ -98,6 +106,7 @@ public class ReceiptService implements Serializable {
   /**
    * Send a filled receipt from the UI to szamlazz.hu
    * the successful receipt is stored in the dao
+   *
    * @param receiptNumber
    * @return
    */
@@ -106,11 +115,12 @@ public class ReceiptService implements Serializable {
     hu.szamlazz.xmlnyugtaget.ObjectFactory objectFactory = new hu.szamlazz.xmlnyugtaget.ObjectFactory();
     hu.szamlazz.xmlnyugtaget.BeallitasokTipus settings = objectFactory.createBeallitasokTipus();
     settings.setSzamlaagentkulcs(agent.getKey());
+    settings.setPdfLetoltes(true);
     hu.szamlazz.xmlnyugtaget.FejlecTipus head = new hu.szamlazz.xmlnyugtaget.FejlecTipus();
     head.setNyugtaszam(receiptNumber);
     xmlnyugtaget.setBeallitasok(settings);
     xmlnyugtaget.setFejlec(head);
-    Xmlnyugtavalasz response = dataExchange(xmlnyugtaget, Action.END_POINT_GET_RECEIPT);
+    Xmlnyugtavalasz response = dataExchange(xmlnyugtaget, Action.END_POINT_GET_RECEIPT, Xmlnyugtavalasz.class);
     if (response.isSikeres()) {
       home.increaseSuccessReceipt();
       dao.addReceipt(response);
@@ -121,36 +131,73 @@ public class ReceiptService implements Serializable {
   }
 
   /**
+   *
+   * @param send
+   * @return
+   */
+  public Xmlnyugtasendvalasz build(ReceiptSend send) {
+
+    Xmlnyugtasend xmlnyugtasend = new Xmlnyugtasend();
+    hu.szamlazz.xmlnyugtasend.BeallitasokTipus settings = new hu.szamlazz.xmlnyugtasend.BeallitasokTipus();
+    hu.szamlazz.xmlnyugtasend.FejlecTipus head = new hu.szamlazz.xmlnyugtasend.FejlecTipus();
+    EmailKuldes mail = new EmailKuldes();
+
+    settings.setSzamlaagentkulcs(agent.getKey());
+    head.setNyugtaszam(send.getReceiptNumber());
+    mail.setEmail(send.getEmail());
+    mail.setEmailReplyto(send.getReplyTo());
+    mail.setEmailTargy(send.getSubject());
+    mail.setEmailSzoveg(send.getMessage());
+
+    xmlnyugtasend.setBeallitasok(settings);
+    xmlnyugtasend.setFejlec(head);
+    xmlnyugtasend.setEmailKuldes(mail);
+    try {
+      Xmlnyugtasendvalasz response = dataExchange(xmlnyugtasend, Action.END_POINT_SEND_RECEIPT, Xmlnyugtasendvalasz.class);
+      return response;
+    } catch (ClassCastException error) {
+      //TODO: CsK:  alkalmanként előfordul ?? kivizsgálandó
+      error.printStackTrace();
+      logger.severe("[CRITICAL ERROR]");
+      logger.severe(error.getMessage());
+      Xmlnyugtasendvalasz xmlnyugtasendvalasz = new Xmlnyugtasendvalasz();
+      xmlnyugtasendvalasz.setHibauzenet("Hiba történt, kérjük próbálja meg újra.");
+      xmlnyugtasendvalasz.setHibakod(500);
+      xmlnyugtasendvalasz.setSikeres(false);
+      return  xmlnyugtasendvalasz;
+    }
+  }
+
+  /**
    * data exchange with InvoiceAgent
    * errors from InvoiceAgent are included in the receipt of error message and the error code 500 will be
+   *
    * @param xml request xml
    * @return response sml
    */
-  private Xmlnyugtavalasz dataExchange(Object xml, Action action) {
+  private synchronized  <T> T dataExchange(Object xml, Action action, Class<T> response) {
     try {
-       File file = InvoiceAgent.serialize(xml, true);
-       switch (action){
-         case END_POINT_CREATE_RECEIPT:
-           return agent.createReceipt(file);
-         case END_POINT_GET_RECEIPT:
-           return agent.getReceipt(file);
-         default:
-           Xmlnyugtavalasz xmlnyugtavalasz = new Xmlnyugtavalasz();
-           xmlnyugtavalasz.setSikeres(false);
-           xmlnyugtavalasz.setHibakod(500); //Internal server error
-           xmlnyugtavalasz.setHibauzenet("Nem implementált kérés");
-           return xmlnyugtavalasz;
-       }
-
+      File file = InvoiceAgent.serialize(xml, true);
+      return agent.call(file, action, response);
     } catch (Exception e) {
-      Xmlnyugtavalasz xmlnyugtavalasz = new Xmlnyugtavalasz();
-      xmlnyugtavalasz.setSikeres(false);
-      xmlnyugtavalasz.setHibakod(500); //Internal server error
-      xmlnyugtavalasz.setHibauzenet(e.getMessage());
-      logger.severe(e.getMessage());
       e.printStackTrace();
-      return xmlnyugtavalasz;
+      logger.severe(e.getMessage());
+      if (response.getClass().equals(Xmlnyugtavalasz.class.getClass())) {
+        Xmlnyugtavalasz xmlnyugtavalasz = new Xmlnyugtavalasz();
+        xmlnyugtavalasz.setSikeres(false);
+        xmlnyugtavalasz.setHibakod(500); //Internal server error
+        xmlnyugtavalasz.setHibauzenet(e.getMessage());
+        return (T) xmlnyugtavalasz;
+      }
+      if (response.getClass().equals(Xmlnyugtasendvalasz.class.getClass())){
+        Xmlnyugtasendvalasz xmlnyugtasendvalasz = new Xmlnyugtasendvalasz();
+        xmlnyugtasendvalasz.setSikeres(false);
+        xmlnyugtasendvalasz.setHibakod(500); //Internal server error
+        xmlnyugtasendvalasz.setHibauzenet(e.getMessage());
+        return (T) xmlnyugtasendvalasz;
+      }
     }
+    throw new RuntimeException("unimplemented response type error");
   }
 
 }

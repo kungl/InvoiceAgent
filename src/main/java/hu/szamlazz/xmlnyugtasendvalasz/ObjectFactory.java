@@ -6,7 +6,7 @@
 //
 
 
-package hu.szamlazz.xmlnyugtaget;
+package hu.szamlazz.xmlnyugtasendvalasz;
 
 import javax.xml.bind.annotation.XmlRegistry;
 
@@ -14,7 +14,7 @@ import javax.xml.bind.annotation.XmlRegistry;
 /**
  * This object contains factory methods for each 
  * Java content interface and Java element interface 
- * generated in the hu.szamlazz.xmlnyugtaget package. 
+ * generated in the hu.szamlazz.xmlnyugtasendvalasz package. 
  * <p>An ObjectFactory allows you to programatically 
  * construct new instances of the Java representation 
  * for XML content. The Java representation of XML 
@@ -30,34 +30,18 @@ public class ObjectFactory {
 
 
     /**
-     * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: hu.szamlazz.xmlnyugtaget
+     * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: hu.szamlazz.xmlnyugtasendvalasz
      * 
      */
     public ObjectFactory() {
     }
 
     /**
-     * Create an instance of {@link Xmlnyugtaget }
+     * Create an instance of {@link Xmlnyugtasendvalasz }
      * 
      */
-    public Xmlnyugtaget createXmlnyugtaget() {
-        return new Xmlnyugtaget();
-    }
-
-    /**
-     * Create an instance of {@link BeallitasokTipus }
-     * 
-     */
-    public BeallitasokTipus createBeallitasokTipus() {
-        return new BeallitasokTipus();
-    }
-
-    /**
-     * Create an instance of {@link FejlecTipus }
-     * 
-     */
-    public FejlecTipus createFejlecTipus() {
-        return new FejlecTipus();
+    public Xmlnyugtasendvalasz createXmlnyugtasendvalasz() {
+        return new Xmlnyugtasendvalasz();
     }
 
 }

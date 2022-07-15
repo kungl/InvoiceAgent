@@ -6,7 +6,7 @@
 //
 
 
-package hu.szamlazz.xmlnyugtacreate;
+package hu.szamlazz.xmlnyugtasend;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -24,12 +24,11 @@ import javax.xml.bind.annotation.XmlType;
  * &lt;complexType&gt;
  *   &lt;complexContent&gt;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *       &lt;all&gt;
- *         &lt;element name="beallitasok" type="{http://www.szamlazz.hu/xmlnyugtacreate}beallitasokTipus"/&gt;
- *         &lt;element name="fejlec" type="{http://www.szamlazz.hu/xmlnyugtacreate}fejlecTipus"/&gt;
- *         &lt;element name="tetelek" type="{http://www.szamlazz.hu/xmlnyugtacreate}tetelekTipus"/&gt;
- *         &lt;element name="kifizetesek" type="{http://www.szamlazz.hu/xmlnyugtacreate}kifizetesekTipus" minOccurs="0"/&gt;
- *       &lt;/all&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element name="beallitasok" type="{http://www.szamlazz.hu/xmlnyugtasend}beallitasokTipus"/&gt;
+ *         &lt;element name="fejlec" type="{http://www.szamlazz.hu/xmlnyugtasend}fejlecTipus"/&gt;
+ *         &lt;element name="emailKuldes" type="{http://www.szamlazz.hu/xmlnyugtasend}emailKuldes" minOccurs="0"/&gt;
+ *       &lt;/sequence&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
  * &lt;/complexType&gt;
@@ -39,18 +38,18 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-
+    "beallitasok",
+    "fejlec",
+    "emailKuldes"
 })
-@XmlRootElement(name = "xmlnyugtacreate")
-public class Xmlnyugtacreate {
+@XmlRootElement(name = "xmlnyugtasend")
+public class Xmlnyugtasend {
 
     @XmlElement(required = true)
     protected BeallitasokTipus beallitasok;
     @XmlElement(required = true)
     protected FejlecTipus fejlec;
-    @XmlElement(required = true)
-    protected TetelekTipus tetelek;
-    protected KifizetesekTipus kifizetesek;
+    protected EmailKuldes emailKuldes;
 
     /**
      * Gets the value of the beallitasok property.
@@ -101,51 +100,27 @@ public class Xmlnyugtacreate {
     }
 
     /**
-     * Gets the value of the tetelek property.
+     * Gets the value of the emailKuldes property.
      * 
      * @return
      *     possible object is
-     *     {@link TetelekTipus }
+     *     {@link EmailKuldes }
      *     
      */
-    public TetelekTipus getTetelek() {
-        return tetelek;
+    public EmailKuldes getEmailKuldes() {
+        return emailKuldes;
     }
 
     /**
-     * Sets the value of the tetelek property.
+     * Sets the value of the emailKuldes property.
      * 
      * @param value
      *     allowed object is
-     *     {@link TetelekTipus }
+     *     {@link EmailKuldes }
      *     
      */
-    public void setTetelek(TetelekTipus value) {
-        this.tetelek = value;
-    }
-
-    /**
-     * Gets the value of the kifizetesek property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link KifizetesekTipus }
-     *     
-     */
-    public KifizetesekTipus getKifizetesek() {
-        return kifizetesek;
-    }
-
-    /**
-     * Sets the value of the kifizetesek property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link KifizetesekTipus }
-     *     
-     */
-    public void setKifizetesek(KifizetesekTipus value) {
-        this.kifizetesek = value;
+    public void setEmailKuldes(EmailKuldes value) {
+        this.emailKuldes = value;
     }
 
 }

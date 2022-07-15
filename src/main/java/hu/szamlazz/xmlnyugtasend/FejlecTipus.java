@@ -6,7 +6,7 @@
 //
 
 
-package hu.szamlazz.xmlnyugtaget;
+package hu.szamlazz.xmlnyugtasend;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -23,11 +23,9 @@ import javax.xml.bind.annotation.XmlType;
  * &lt;complexType name="fejlecTipus"&gt;
  *   &lt;complexContent&gt;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *       &lt;all&gt;
+ *       &lt;sequence&gt;
  *         &lt;element name="nyugtaszam" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
- *         &lt;element name="hivasAzonosito" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/&gt;
- *         &lt;element name="pdfSablon" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/&gt;
- *       &lt;/all&gt;
+ *       &lt;/sequence&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
  * &lt;/complexType&gt;
@@ -37,14 +35,12 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "fejlecTipus", propOrder = {
-
+    "nyugtaszam"
 })
 public class FejlecTipus {
 
     @XmlElement(required = true)
     protected String nyugtaszam;
-    protected String hivasAzonosito;
-    protected String pdfSablon;
 
     /**
      * Gets the value of the nyugtaszam property.
@@ -68,54 +64,6 @@ public class FejlecTipus {
      */
     public void setNyugtaszam(String value) {
         this.nyugtaszam = value;
-    }
-
-    /**
-     * Gets the value of the hivasAzonosito property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getHivasAzonosito() {
-        return hivasAzonosito;
-    }
-
-    /**
-     * Sets the value of the hivasAzonosito property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setHivasAzonosito(String value) {
-        this.hivasAzonosito = value;
-    }
-
-    /**
-     * Gets the value of the pdfSablon property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getPdfSablon() {
-        return pdfSablon;
-    }
-
-    /**
-     * Sets the value of the pdfSablon property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setPdfSablon(String value) {
-        this.pdfSablon = value;
     }
 
 }

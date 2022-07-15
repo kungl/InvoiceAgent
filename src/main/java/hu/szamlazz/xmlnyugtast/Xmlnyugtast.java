@@ -6,7 +6,7 @@
 //
 
 
-package hu.szamlazz.xmlnyugtacreate;
+package hu.szamlazz.xmlnyugtast;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -24,12 +24,10 @@ import javax.xml.bind.annotation.XmlType;
  * &lt;complexType&gt;
  *   &lt;complexContent&gt;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *       &lt;all&gt;
- *         &lt;element name="beallitasok" type="{http://www.szamlazz.hu/xmlnyugtacreate}beallitasokTipus"/&gt;
- *         &lt;element name="fejlec" type="{http://www.szamlazz.hu/xmlnyugtacreate}fejlecTipus"/&gt;
- *         &lt;element name="tetelek" type="{http://www.szamlazz.hu/xmlnyugtacreate}tetelekTipus"/&gt;
- *         &lt;element name="kifizetesek" type="{http://www.szamlazz.hu/xmlnyugtacreate}kifizetesekTipus" minOccurs="0"/&gt;
- *       &lt;/all&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element name="beallitasok" type="{http://www.szamlazz.hu/xmlnyugtast}beallitasokTipus"/&gt;
+ *         &lt;element name="fejlec" type="{http://www.szamlazz.hu/xmlnyugtast}fejlecTipus"/&gt;
+ *       &lt;/sequence&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
  * &lt;/complexType&gt;
@@ -39,18 +37,16 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-
+    "beallitasok",
+    "fejlec"
 })
-@XmlRootElement(name = "xmlnyugtacreate")
-public class Xmlnyugtacreate {
+@XmlRootElement(name = "xmlnyugtast")
+public class Xmlnyugtast {
 
     @XmlElement(required = true)
     protected BeallitasokTipus beallitasok;
     @XmlElement(required = true)
     protected FejlecTipus fejlec;
-    @XmlElement(required = true)
-    protected TetelekTipus tetelek;
-    protected KifizetesekTipus kifizetesek;
 
     /**
      * Gets the value of the beallitasok property.
@@ -98,54 +94,6 @@ public class Xmlnyugtacreate {
      */
     public void setFejlec(FejlecTipus value) {
         this.fejlec = value;
-    }
-
-    /**
-     * Gets the value of the tetelek property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link TetelekTipus }
-     *     
-     */
-    public TetelekTipus getTetelek() {
-        return tetelek;
-    }
-
-    /**
-     * Sets the value of the tetelek property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link TetelekTipus }
-     *     
-     */
-    public void setTetelek(TetelekTipus value) {
-        this.tetelek = value;
-    }
-
-    /**
-     * Gets the value of the kifizetesek property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link KifizetesekTipus }
-     *     
-     */
-    public KifizetesekTipus getKifizetesek() {
-        return kifizetesek;
-    }
-
-    /**
-     * Sets the value of the kifizetesek property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link KifizetesekTipus }
-     *     
-     */
-    public void setKifizetesek(KifizetesekTipus value) {
-        this.kifizetesek = value;
     }
 
 }

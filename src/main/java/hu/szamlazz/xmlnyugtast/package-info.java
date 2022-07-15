@@ -5,5 +5,5 @@
 // Generated on: 2022.07.15 at 08:51:13 AM CEST 
 //
 
-@javax.xml.bind.annotation.XmlSchema(namespace = "http://www.szamlazz.hu/xmlnyugtacreate", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
-package hu.szamlazz.xmlnyugtacreate;
+@javax.xml.bind.annotation.XmlSchema(namespace = "http://www.szamlazz.hu/xmlnyugtast", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
+package hu.szamlazz.xmlnyugtast;

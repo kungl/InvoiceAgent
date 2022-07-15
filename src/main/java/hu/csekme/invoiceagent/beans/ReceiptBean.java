@@ -129,6 +129,12 @@ public class ReceiptBean implements Serializable {
     return valid;
   }
 
+  /**
+   * Send message to the UI
+   * @param severity Level
+   * @param summary as Title
+   * @param detail as Body
+   */
   public void addMessage(FacesMessage.Severity severity, String summary, String detail) {
     FacesContext.getCurrentInstance().
             addMessage(null, new FacesMessage(severity, summary, detail));

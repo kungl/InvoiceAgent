@@ -6,7 +6,7 @@
 //
 
 
-package hu.szamlazz.xmlnyugtaget;
+package hu.szamlazz.xmlnyugtasend;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -22,12 +22,11 @@ import javax.xml.bind.annotation.XmlType;
  * &lt;complexType name="beallitasokTipus"&gt;
  *   &lt;complexContent&gt;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *       &lt;all&gt;
+ *       &lt;sequence&gt;
  *         &lt;element name="felhasznalo" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/&gt;
  *         &lt;element name="jelszo" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/&gt;
  *         &lt;element name="szamlaagentkulcs" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/&gt;
- *         &lt;element name="pdfLetoltes" type="{http://www.w3.org/2001/XMLSchema}boolean"/&gt;
- *       &lt;/all&gt;
+ *       &lt;/sequence&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
  * &lt;/complexType&gt;
@@ -37,14 +36,15 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "beallitasokTipus", propOrder = {
-
+    "felhasznalo",
+    "jelszo",
+    "szamlaagentkulcs"
 })
 public class BeallitasokTipus {
 
     protected String felhasznalo;
     protected String jelszo;
     protected String szamlaagentkulcs;
-    protected boolean pdfLetoltes;
 
     /**
      * Gets the value of the felhasznalo property.
@@ -116,22 +116,6 @@ public class BeallitasokTipus {
      */
     public void setSzamlaagentkulcs(String value) {
         this.szamlaagentkulcs = value;
-    }
-
-    /**
-     * Gets the value of the pdfLetoltes property.
-     * 
-     */
-    public boolean isPdfLetoltes() {
-        return pdfLetoltes;
-    }
-
-    /**
-     * Sets the value of the pdfLetoltes property.
-     * 
-     */
-    public void setPdfLetoltes(boolean value) {
-        this.pdfLetoltes = value;
     }
 
 }

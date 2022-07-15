@@ -58,56 +58,32 @@ public class InvoiceAgent implements Serializable {
    * @throws Exception in case of an unexpected event
    */
   @PostConstruct
-  public void init() throws Exception {
-    TrustStrategy acceptingTrustStrategy = (cert, authType) -> true;
-    SSLContext sslContext = SSLContexts.custom().loadTrustMaterial(null, acceptingTrustStrategy).build();
-    sslsf = new SSLConnectionSocketFactory(sslContext, NoopHostnameVerifier.INSTANCE);
-    Registry<ConnectionSocketFactory> socketFactoryRegistry =
-            RegistryBuilder.<ConnectionSocketFactory>create()
-                    .register("https", sslsf)
-                    .register("http", new PlainConnectionSocketFactory())
-                    .build();
-    connectionManager = new BasicHttpClientConnectionManager(socketFactoryRegistry);
-  }
-
-
-  /**
-   * Call https://www.szamlazz.hu/szamla/ endpoint with an xml file
-   * ACTION: action-szamla_agent_nyugta_create
-   *
-   * request xsd http://www.szamlazz.hu/docs/xsds/nyugta/xmlnyugtacreate.xsd
-   * response xsd https://www.szamlazz.hu/szamla/docs/xsds/nyugtavalasz/xmlnyugtavalasz.xsd
-   * @param xml file
-   * @return Xmlnyugtavalasz
-   * @throws Exception in case of an unexpected event
-   */
-  public Xmlnyugtavalasz createReceipt(File xml) throws Exception {
-    return call(xml, Action.END_POINT_CREATE_RECEIPT);
+  public void init()  {
+    try {
+      TrustStrategy acceptingTrustStrategy = (cert, authType) -> true;
+      SSLContext sslContext = SSLContexts.custom().loadTrustMaterial(null, acceptingTrustStrategy).build();
+      sslsf = new SSLConnectionSocketFactory(sslContext, NoopHostnameVerifier.INSTANCE);
+      Registry<ConnectionSocketFactory> socketFactoryRegistry =
+              RegistryBuilder.<ConnectionSocketFactory>create()
+                      .register("https", sslsf)
+                      .register("http", new PlainConnectionSocketFactory())
+                      .build();
+      connectionManager = new BasicHttpClientConnectionManager(socketFactoryRegistry);
+    } catch (Exception err) {
+      err.printStackTrace();
+      logger.severe(err.getMessage());
+    }
   }
 
   /**
-   * Call https://www.szamlazz.hu/szamla/ endpoint with an xml file
-   * ACTION: action-szamla_agent_nyugta_create
-   *
-   * request xsd http://www.szamlazz.hu/docs/xsds/nyugta/xmlnyugtacreate.xsd
-   * response xsd https://www.szamlazz.hu/szamla/docs/xsds/nyugtavalasz/xmlnyugtavalasz.xsd
-   * @param xml file
-   * @return Xmlnyugtavalasz
-   * @throws Exception in case of an unexpected event
-   */
-  public Xmlnyugtavalasz getReceipt(File xml) throws Exception {
-    return call(xml, Action.END_POINT_GET_RECEIPT);
-  }
-
-  /**
-   * Create a request to szamlazz.hu api
+   * Create request to https://www.szamlazz.hu/szamla/ endpoint with an xml file
    * @param xml valid xml based request file
    * @param action endpoint action
    * @return Xmlnyugtavalasz as response
    * @throws Exception in case of an unexpected event
    * @see Action
    */
-  private Xmlnyugtavalasz call(File xml, Action action) throws Exception {
+  public synchronized  <T> T call(File xml, Action action, Class<T> responseClass) throws Exception {
     CloseableHttpClient httpClient = HttpClients.custom().setSSLSocketFactory(sslsf).setConnectionManager(connectionManager).build();
     HttpPost post = new HttpPost(INVOICE_AGENT_API);
     MultipartEntityBuilder builder = MultipartEntityBuilder.create();
@@ -123,9 +99,8 @@ public class InvoiceAgent implements Serializable {
     while ((bytesRead = in.read(contents)) != -1) {
       sb.append(new String(contents, 0, bytesRead, StandardCharsets.UTF_8));
     }
-    return deserialize(sb.toString(), Xmlnyugtavalasz.class);
+    return deserialize(sb.toString(), responseClass);
   }
-
 
   /**
    * Produces a java object from xml content

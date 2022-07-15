@@ -33,10 +33,11 @@
                         <hr/>
 
                         <h:form styleClass="row g-4" prependId="false" enctype="">
-                            <div class="col-md-3">
+                            <div class="col-md-6">
                                 <h:outputLabel for="elotag" styleClass="form-label">Nyugtaszám</h:outputLabel>
                                 <h:inputText styleClass="form-control" id="elotag" value="#{receiptListBean.receiptNumber}"/>
-                                <p:commandButton ajax="false" value="Lekérés" actionListener="#{receiptListBean.get}"></p:commandButton>
+                                <div id="emailHelp" class="form-text">Nyugtaszám alapján lekérhető a szamlazz.hu-tól a korábban kiállított nyugta.</div>
+                                <h:commandButton styleClass="btn btn-primary shadow" value="Lekérés" actionListener="#{receiptListBean.get}"></h:commandButton>
                             </div>
                             <p class="p-m-0">
                                 <p:dataTable widgetVar="dtEntries" emptyMessage="Nincs még rögzítve tétel"
@@ -63,8 +64,17 @@
                                     </p:column>
 
                                     <p:column exportable="false">
+
                                         <p:commandButton value="Nyugtakép" ajax="false" icon="pi pi-download"
                                                          action="#{receiptListBean.download}"
+                                                         styleClass="rounded-button ui-button-success" process="@this">
+                                            <f:setPropertyActionListener value="#{entry}"
+                                                                         target="#{receiptListBean.selected}"/>
+                                            <f:ajax disabled="true"/>
+                                        </p:commandButton>
+
+                                        <p:commandButton value="Levél" ajax="false" icon="pi pi-send"
+                                                         action="#{receiptListBean.send}"
                                                          styleClass="rounded-button ui-button-success" process="@this">
                                             <f:setPropertyActionListener value="#{entry}"
                                                                          target="#{receiptListBean.selected}"/>

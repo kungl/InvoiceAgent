@@ -6,7 +6,7 @@
 //
 
 
-package hu.szamlazz.xmlnyugtaget;
+package hu.szamlazz.xmlnyugtast;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -22,12 +22,12 @@ import javax.xml.bind.annotation.XmlType;
  * &lt;complexType name="beallitasokTipus"&gt;
  *   &lt;complexContent&gt;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *       &lt;all&gt;
+ *       &lt;sequence&gt;
  *         &lt;element name="felhasznalo" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/&gt;
  *         &lt;element name="jelszo" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/&gt;
  *         &lt;element name="szamlaagentkulcs" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/&gt;
  *         &lt;element name="pdfLetoltes" type="{http://www.w3.org/2001/XMLSchema}boolean"/&gt;
- *       &lt;/all&gt;
+ *       &lt;/sequence&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
  * &lt;/complexType&gt;
@@ -37,7 +37,10 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "beallitasokTipus", propOrder = {
-
+    "felhasznalo",
+    "jelszo",
+    "szamlaagentkulcs",
+    "pdfLetoltes"
 })
 public class BeallitasokTipus {
 

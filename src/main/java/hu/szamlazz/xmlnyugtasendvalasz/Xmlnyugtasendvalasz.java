@@ -6,7 +6,7 @@
 //
 
 
-package hu.szamlazz.xmlnyugtavalasz;
+package hu.szamlazz.xmlnyugtasendvalasz;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -27,8 +27,6 @@ import javax.xml.bind.annotation.XmlType;
  *         &lt;element name="sikeres" type="{http://www.w3.org/2001/XMLSchema}boolean"/&gt;
  *         &lt;element name="hibakod" type="{http://www.w3.org/2001/XMLSchema}int" minOccurs="0"/&gt;
  *         &lt;element name="hibauzenet" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/&gt;
- *         &lt;element name="nyugtaPdf" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/&gt;
- *         &lt;element name="nyugta" type="{http://www.szamlazz.hu/xmlnyugtavalasz}nyugtaTipus" minOccurs="0"/&gt;
  *       &lt;/all&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
@@ -41,14 +39,12 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "", propOrder = {
 
 })
-@XmlRootElement(name = "xmlnyugtavalasz")
-public class Xmlnyugtavalasz {
+@XmlRootElement(name = "xmlnyugtasendvalasz")
+public class Xmlnyugtasendvalasz {
 
     protected boolean sikeres;
     protected Integer hibakod;
     protected String hibauzenet;
-    protected String nyugtaPdf;
-    protected NyugtaTipus nyugta;
 
     /**
      * Gets the value of the sikeres property.
@@ -114,52 +110,12 @@ public class Xmlnyugtavalasz {
         this.hibauzenet = value;
     }
 
-    /**
-     * Gets the value of the nyugtaPdf property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getNyugtaPdf() {
-        return nyugtaPdf;
+    @Override
+    public String toString() {
+        return "Xmlnyugtasendvalasz{" +
+                "sikeres=" + sikeres +
+                ", hibakod=" + hibakod +
+                ", hibauzenet='" + hibauzenet + '\'' +
+                '}';
     }
-
-    /**
-     * Sets the value of the nyugtaPdf property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setNyugtaPdf(String value) {
-        this.nyugtaPdf = value;
-    }
-
-    /**
-     * Gets the value of the nyugta property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link NyugtaTipus }
-     *     
-     */
-    public NyugtaTipus getNyugta() {
-        return nyugta;
-    }
-
-    /**
-     * Sets the value of the nyugta property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link NyugtaTipus }
-     *     
-     */
-    public void setNyugta(NyugtaTipus value) {
-        this.nyugta = value;
-    }
-
 }
