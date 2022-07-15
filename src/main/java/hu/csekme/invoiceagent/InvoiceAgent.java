@@ -1,7 +1,5 @@
 package hu.csekme.invoiceagent;
-
 import hu.csekme.invoiceagent.enums.Action;
-import hu.szamlazz.xmlnyugtavalasz.Xmlnyugtavalasz;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -54,8 +52,7 @@ public class InvoiceAgent implements Serializable {
   private String key;
 
   /**
-   * One time initialization
-   * @throws Exception in case of an unexpected event
+   * one time initialization
    */
   @PostConstruct
   public void init()  {

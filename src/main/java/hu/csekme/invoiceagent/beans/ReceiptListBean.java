@@ -4,7 +4,7 @@ import hu.csekme.invoiceagent.domain.ReceiptSend;
 import hu.csekme.invoiceagent.service.ReceiptService;
 import hu.szamlazz.xmlnyugtasendvalasz.Xmlnyugtasendvalasz;
 import hu.szamlazz.xmlnyugtavalasz.Xmlnyugtavalasz;
-import javax.enterprise.context.RequestScoped;
+import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
@@ -15,10 +15,18 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.Base64;
+import java.util.logging.Logger;
 
+/**
+ * Listing of receipts which are recorded on szamlazz.hu
+ * during a session.
+ * @author Krisztián Csekme
+ */
 @Named
 @ViewScoped
 public class ReceiptListBean implements Serializable {
+
+  private static final Logger logger = Logger.getLogger(ReceiptListBean.class.getName());
 
   @Inject
   ReceiptService service;
@@ -28,12 +36,20 @@ public class ReceiptListBean implements Serializable {
 
   Xmlnyugtavalasz selected;
 
+  ReceiptSend receiptSend;
+
   String receiptNumber;
 
+  @PostConstruct
+  public void init() {
+    receiptSend = new ReceiptSend();
+  }
+
   /**
-   * Get receipt from szamlazz.hu
+   * get receipt from szamlazz.hu
    */
   public String get() {
+    logger.info("get receipt");
     if (receiptNumber==null || receiptNumber.isEmpty()) {
       addMessage(FacesMessage.SEVERITY_WARN, "Figyelem", "Kérem adja meg a nyugtaszámot");
       return "receipts.xhtml";
@@ -51,10 +67,11 @@ public class ReceiptListBean implements Serializable {
   }
 
   /**
-   * Download Receipe PDF
+   * download receipt PDF
    * @throws IOException
    */
   public void download() throws IOException {
+    logger.info("download receipt");
     if (selected!=null && selected.getNyugtaPdf()!=null) {
       byte[] pdf = Base64.getDecoder().decode(selected.getNyugtaPdf());
       FacesContext fc = FacesContext.getCurrentInstance();
@@ -72,23 +89,35 @@ public class ReceiptListBean implements Serializable {
     }
   }
 
+  /**
+   * send receipt via email
+   */
   public void send() {
+    logger.info("send receipt");
     if (selected!=null) {
-      ReceiptSend send = new ReceiptSend();
-      send.setReceiptNumber(selected.getNyugta().getAlap().getNyugtaszam());
-      send.setReplyTo("csekme.krisztian@outlook.com");
-      send.setEmail("csekme.krisztian@outlook.com");
-      send.setSubject("Próba levél");
-      send.setMessage("Teszt üzenet");
-
-        Xmlnyugtasendvalasz response = service.build(send);
-        System.out.println(response);
+      receiptSend.setReceiptNumber(selected.getNyugta().getAlap().getNyugtaszam());
+        Xmlnyugtasendvalasz response = service.build(receiptSend);
+        receiptSend = new ReceiptSend();
         if (!response.isSikeres()) {
           addMessage(FacesMessage.SEVERITY_ERROR, "Hiba történt", response.getHibauzenet());
         } else {
           addMessage(FacesMessage.SEVERITY_INFO, "Levél küldése", "A nyugtát sikeresen elküldtük!");
         }
+    }
+  }
 
+  /**
+   * receipt cancellation
+   */
+  public void cancel() {
+    logger.info("cancel receipt");
+    if (selected!=null) {
+      Xmlnyugtavalasz response = service.cancel(selected.getNyugta().getAlap().getNyugtaszam());
+      if (!response.isSikeres()) {
+        addMessage(FacesMessage.SEVERITY_ERROR, "Hiba történt", response.getHibauzenet());
+      } else {
+        dao.addReceipt(response);
+      }
     }
   }
 
@@ -125,5 +154,21 @@ public class ReceiptListBean implements Serializable {
 
   public void setReceiptNumber(String receiptNumber) {
     this.receiptNumber = receiptNumber;
+  }
+
+  public ReceiptService getService() {
+    return service;
+  }
+
+  public void setService(ReceiptService service) {
+    this.service = service;
+  }
+
+  public ReceiptSend getReceiptSend() {
+    return receiptSend;
+  }
+
+  public void setReceiptSend(ReceiptSend receiptSend) {
+    this.receiptSend = receiptSend;
   }
 }

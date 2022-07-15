@@ -32,12 +32,16 @@
                         <p class="col-md-12 fs-4">Rögzített nyugták</p>
                         <hr/>
 
-                        <h:form styleClass="row g-4" prependId="false" enctype="">
+                        <h:form id="form" styleClass="row g-4" prependId="false" enctype="">
                             <div class="col-md-6">
                                 <h:outputLabel for="elotag" styleClass="form-label">Nyugtaszám</h:outputLabel>
-                                <h:inputText styleClass="form-control" id="elotag" value="#{receiptListBean.receiptNumber}"/>
-                                <div id="emailHelp" class="form-text">Nyugtaszám alapján lekérhető a szamlazz.hu-tól a korábban kiállított nyugta.</div>
-                                <h:commandButton styleClass="btn btn-primary shadow" value="Lekérés" actionListener="#{receiptListBean.get}"></h:commandButton>
+                                <h:inputText styleClass="form-control" id="elotag"
+                                             value="#{receiptListBean.receiptNumber}"/>
+                                <div id="emailHelp"
+                                     class="form-text">Nyugtaszám alapján lekérhető a szamlazz.hu-tól a korábban kiállított nyugta.
+                                </div>
+                                <h:commandButton styleClass="btn btn-primary shadow" value="Lekérés"
+                                                 actionListener="#{receiptListBean.get}"></h:commandButton>
                             </div>
                             <p class="p-m-0">
                                 <p:dataTable widgetVar="dtEntries" emptyMessage="Nincs még rögzítve tétel"
@@ -63,7 +67,7 @@
                                         <h:outputText value="#{entry.nyugta.osszegek.totalossz.brutto}"></h:outputText>
                                     </p:column>
 
-                                    <p:column exportable="false">
+                                    <p:column width="310" exportable="false">
 
                                         <p:commandButton value="Nyugtakép" ajax="false" icon="pi pi-download"
                                                          action="#{receiptListBean.download}"
@@ -73,16 +77,67 @@
                                             <f:ajax disabled="true"/>
                                         </p:commandButton>
 
-                                        <p:commandButton value="Levél" ajax="false" icon="pi pi-send"
-                                                         action="#{receiptListBean.send}"
-                                                         styleClass="rounded-button ui-button-success" process="@this">
+                                        <p:commandButton update=":form:mailDetail" oncomplete="PF('dlgMail').show();"
+                                                         value="Levél" icon="pi pi-send"
+                                                         styleClass="rounded-button ui-button-success">
                                             <f:setPropertyActionListener value="#{entry}"
                                                                          target="#{receiptListBean.selected}"/>
+                                        </p:commandButton>
+
+                                        <p:commandButton rendered="#{!entry.nyugta.alap.stornozott}" value="Sztornó" ajax="false" icon="pi pi-trash"
+                                                         action="#{receiptListBean.cancel}"
+                                                         styleClass="rounded-button ui-button-danger">
+                                             <f:setPropertyActionListener value="#{entry}" target="#{receiptListBean.selected}"/>
                                             <f:ajax disabled="true"/>
                                         </p:commandButton>
+
                                     </p:column>
 
                                 </p:dataTable>
+
+                                <p:dialog header="Nyugta küldése emailben" widgetVar="dlgMail" minHeight="40"
+                                          width="400"
+                                          showEffect="fade" modal="true">
+                                    <p:outputPanel id="mailDetail">
+                                        <div id="receipt-entry-fields" class="ui-fluid p-formgrid p-grid">
+                                            <div class="p-field p-col">
+                                                <label>Nyugtaszám</label>
+                                                <p:inputText class="required" readonly="true"
+                                                             value="#{receiptListBean.selected.nyugta.alap.nyugtaszam}"/>
+                                            </div>
+                                            <div class="p-field p-col">
+                                                <label>Email cím</label>
+                                                <p:inputText class="required"
+                                                             value="#{receiptListBean.receiptSend.email}"/>
+                                            </div>
+                                            <div class="p-field p-col">
+                                                <label>Válaszcím</label>
+                                                <p:inputText inputStyleClass="required"
+                                                             value="#{receiptListBean.receiptSend.replyTo}"/>
+                                            </div>
+                                            <div class="p-field p-col">
+                                                <label>Tárgy</label>
+                                                <p:inputText class="required"
+                                                             value="#{receiptListBean.receiptSend.subject}"/>
+                                            </div>
+                                            <div class="p-field p-col">
+                                                <label>Üzenet</label>
+                                                <p:inputTextarea inputStyleClass="required"
+                                                                 value="#{receiptListBean.receiptSend.message}"/>
+                                            </div>
+                                        </div>
+                                    </p:outputPanel>
+                                    <f:facet name="footer">
+                                        <h:commandButton styleClass="btn btn-light shadow" value="Mégse"
+                                                         onclick="PF('dlgMail').hide(); return false;"/>
+
+                                        <h:commandButton styleClass="btn btn-danger shadow" style="margin-left: 12px;"
+                                                         value="Küldés"
+                                                         onclick="return isFilled();"
+                                                         actionListener="#{receiptListBean.send}"/>
+                                    </f:facet>
+                                </p:dialog>
+
                             </p>
                         </h:form>
                     </div>

@@ -1,18 +1,18 @@
 package hu.csekme.invoiceagent.beans;
 import hu.csekme.invoiceagent.AuthorizationFilter;
 import hu.csekme.invoiceagent.InvoiceAgent;
-
 import javax.enterprise.context.RequestScoped;
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.Serializable;
 import java.util.logging.Logger;
 
 /**
- * Access control bean
+ * Login bean
+ * logging in requires the entry of a valid API key
+ * validation is not done during login
  * @author Krisztián Csekme
  */
 @Named

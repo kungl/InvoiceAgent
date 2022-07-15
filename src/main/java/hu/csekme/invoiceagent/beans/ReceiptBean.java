@@ -1,10 +1,8 @@
 package hu.csekme.invoiceagent.beans;
-
 import hu.csekme.invoiceagent.domain.Receipt;
 import hu.csekme.invoiceagent.domain.ReceiptEntry;
 import hu.csekme.invoiceagent.service.ReceiptService;
 import hu.szamlazz.xmlnyugtavalasz.Xmlnyugtavalasz;
-
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
@@ -12,12 +10,17 @@ import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
-
 /**
- * Receipt editor bean
- *
+ * Receipt handler bean
+ * uses a public domain class (Receipt,ReceiptEntry)
+ * for communication between UI and interface
  * @author Krisztián Csekme
+ * @see ReceiptEntry
+ * @see SettingsBean
+ * @see Receipt
  * @see ReceiptEntry
  */
 @Named
@@ -31,6 +34,8 @@ public class ReceiptBean implements Serializable {
   SettingsBean settingsBean;
 
   Receipt receipt;
+
+  ReceiptEntry selectedEntry;
 
   /**
    * átutalás, készpénz, bankkártya, csekk, utánvét, ajándékutalvány,
@@ -80,7 +85,20 @@ public class ReceiptBean implements Serializable {
   }
 
   /**
-   * Add new entry
+   * delete a temporary entry
+   */
+  public void remove() {
+    if (selectedEntry!=null) {
+      for (int i=receipt.getReceiptEntryList().size()-1; i>=0; i--) {
+        if (receipt.getReceiptEntryList().get(i).getUuid().equals(selectedEntry.getUuid())){
+          receipt.getReceiptEntryList().remove(i);
+        }
+      }
+    }
+  }
+
+  /**
+   * add new entry for receipt
    */
   public void addEntry() {
     receipt.addReceiptEntry(new ReceiptEntry(entryName, entryQuantity, entryUnit, entryNetUnitPrice, entryNet, entryVatKey, entryVat, entryGross));
@@ -88,18 +106,32 @@ public class ReceiptBean implements Serializable {
   }
 
   /**
-   * Calculate entry fields
+   * calculate entry fields dynamically
+   * TODO: the VAT rate is fixed at 27 percent
    */
   public void autoCalcEntryFields() {
     if (getEntryQuantity() != null && getEntryNetUnitPrice() != null) {
       setEntryNet(getEntryQuantity() * getEntryNetUnitPrice());
-      setEntryVat(getEntryNet() * 0.27); // fix áfakulcs
+      setEntryVat(round(getEntryNet() * 0.27, 2)); // fix áfakulcs
       setEntryGross(getEntryNet() + getEntryVat());
     }
   }
 
   /**
-   * Generate receipt
+   * Round double value
+   * @param value number to be rounded
+   * @param places decimal places
+   * @return rounded value
+   */
+  public static double round(double value, int places) {
+    if (places < 0) throw new IllegalArgumentException();
+    BigDecimal bd = BigDecimal.valueOf(value);
+    bd = bd.setScale(places, RoundingMode.HALF_UP);
+    return bd.doubleValue();
+  }
+
+  /**
+   * generate receipt
    */
   public String generateReceipt() {
     //Fill receipt
@@ -107,8 +139,7 @@ public class ReceiptBean implements Serializable {
       Xmlnyugtavalasz valasz = service.build(receipt);
       if (valasz.isSikeres()) {
         addMessage(FacesMessage.SEVERITY_INFO, "Sikeres nyugta létrhozva",
-                String.format("Nyugta száma: %s",
-                        valasz.getNyugta().getAlap().getNyugtaszam()
+                String.format("Nyugta száma: %s", valasz.getNyugta().getAlap().getNyugtaszam()
                 )
         );
         return "receipts.xhtml?faces-redirect=true";
@@ -120,6 +151,10 @@ public class ReceiptBean implements Serializable {
     return null;
   }
 
+  /**
+   * server side validation
+   * @return true if fields are filled correctly
+   */
   public boolean validation() {
     boolean valid = true;
     if (receipt.getPrefix()==null || receipt.getPrefix().isEmpty()) {
@@ -141,7 +176,7 @@ public class ReceiptBean implements Serializable {
   }
 
   /**
-   * Clear entry fields
+   * clear entry fields and setting default values
    */
   private void clearEntryFields() {
     this.entryGross = null;
@@ -258,4 +293,11 @@ public class ReceiptBean implements Serializable {
     this.receipt = receipt;
   }
 
+  public ReceiptEntry getSelectedEntry() {
+    return selectedEntry;
+  }
+
+  public void setSelectedEntry(ReceiptEntry selectedEntry) {
+    this.selectedEntry = selectedEntry;
+  }
 }

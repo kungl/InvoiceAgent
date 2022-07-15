@@ -1,5 +1,8 @@
 package hu.csekme.invoiceagent.domain;
-
+/**
+ * Helper class for sending a receipt via mail
+ * @author Krisztián Csekme
+ */
 public class ReceiptSend {
 
   String receiptNumber;

@@ -1,5 +1,4 @@
 package hu.csekme.invoiceagent.service;
-
 import hu.csekme.invoiceagent.InvoiceAgent;
 import hu.csekme.invoiceagent.beans.HomeBean;
 import hu.csekme.invoiceagent.dao.XmlResponseDao;
@@ -12,8 +11,8 @@ import hu.szamlazz.xmlnyugtaget.Xmlnyugtaget;
 import hu.szamlazz.xmlnyugtasend.EmailKuldes;
 import hu.szamlazz.xmlnyugtasend.Xmlnyugtasend;
 import hu.szamlazz.xmlnyugtasendvalasz.Xmlnyugtasendvalasz;
+import hu.szamlazz.xmlnyugtast.Xmlnyugtast;
 import hu.szamlazz.xmlnyugtavalasz.Xmlnyugtavalasz;
-
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -25,10 +24,10 @@ import java.util.logging.Logger;
 
 /**
  * Receipt Management Service
- * With the help of this service, we can overcome the calling xml.
+ * With the help of this service, we can handling requests via xml.
  * InvoiceAgent receives the assembled xml and provides an interface to szamlazz.hu
  * The generated receipts are stored in the XmlResponseDao repository
- *
+ * @author Krisztián Csekme
  * @see InvoiceAgent
  * @see XmlResponseDao
  */
@@ -108,7 +107,7 @@ public class ReceiptService implements Serializable {
    * the successful receipt is stored in the dao
    *
    * @param receiptNumber
-   * @return
+   * @return Xmlnyugtavalasz as response
    */
   public Xmlnyugtavalasz build(String receiptNumber) {
     Xmlnyugtaget xmlnyugtaget = new Xmlnyugtaget();
@@ -131,9 +130,10 @@ public class ReceiptService implements Serializable {
   }
 
   /**
-   *
-   * @param send
-   * @return
+   * Send receipt via email
+   * @param send request class
+   * @return Xmlnyugtasendvalasz as response
+   * @see ReceiptSend
    */
   public Xmlnyugtasendvalasz build(ReceiptSend send) {
 
@@ -166,6 +166,26 @@ public class ReceiptService implements Serializable {
       xmlnyugtasendvalasz.setSikeres(false);
       return  xmlnyugtasendvalasz;
     }
+  }
+
+  /**
+   * Receipt cancellation
+   * @param receiptNumber as number
+   * @return Xmlnyugtavalasz as response
+   */
+  public Xmlnyugtavalasz cancel(String receiptNumber) {
+    Xmlnyugtast xmlnyugtast = new Xmlnyugtast();
+    hu.szamlazz.xmlnyugtast.BeallitasokTipus settings = new hu.szamlazz.xmlnyugtast.BeallitasokTipus();
+    hu.szamlazz.xmlnyugtast.FejlecTipus head = new hu.szamlazz.xmlnyugtast.FejlecTipus();
+
+    settings.setSzamlaagentkulcs(agent.getKey());
+    head.setNyugtaszam(receiptNumber);
+
+    xmlnyugtast.setBeallitasok(settings);
+    xmlnyugtast.setFejlec(head);
+
+    Xmlnyugtavalasz response = dataExchange(xmlnyugtast, Action.END_POINT_STORNO_RECEIPT, Xmlnyugtavalasz.class);
+    return response;
   }
 
   /**

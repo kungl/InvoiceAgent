@@ -4,15 +4,17 @@ import org.primefaces.model.DashboardColumn;
 import org.primefaces.model.DashboardModel;
 import org.primefaces.model.DefaultDashboardColumn;
 import org.primefaces.model.DefaultDashboardModel;
-
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.util.Date;
-
+/**
+ * Home Page bean
+ * logs successful and unsuccessful receipt generations
+ * while the application is running
+ * @author Krisztián Csekme
+ */
 @Named
 @ApplicationScoped
 public class HomeBean implements Serializable {
@@ -20,8 +22,8 @@ public class HomeBean implements Serializable {
   private int numberOfSuccessGeneratedReceipt;
   private int numberOfFailedGeneratedReceipt;
   private int serverRunning;
-  private DashboardModel model;
   private long startServer;
+  private DashboardModel model;
 
   @Inject
   XmlResponseDao dao;

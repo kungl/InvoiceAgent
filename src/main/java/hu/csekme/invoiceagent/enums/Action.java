@@ -1,5 +1,9 @@
 package hu.csekme.invoiceagent.enums;
 
+/**
+ * Dedicated operations of the InvoiceAgent web service
+ * @author Krisztián Csekme
+ */
 public enum Action {
 
   END_POINT_CREATE_RECEIPT("action-szamla_agent_nyugta_create"),

@@ -2,6 +2,11 @@ package hu.csekme.invoiceagent.domain;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Receipt domain class to communicate between UI and Interface
+ * @author Krisztián Csekme
+ * @see ReceiptEntry
+ */
 public class Receipt {
 
   private String paymentMethod;

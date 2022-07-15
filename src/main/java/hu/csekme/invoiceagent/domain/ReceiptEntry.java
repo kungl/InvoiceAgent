@@ -1,7 +1,10 @@
 package hu.csekme.invoiceagent.domain;
-
-import java.rmi.server.UID;
-
+import java.util.UUID;
+/**
+ * ReceiptEntry is a receipt item
+ * @author Krisztián Csekme
+ * @see Receipt
+ */
 public class ReceiptEntry {
   //ID
   String uuid;
@@ -23,9 +26,11 @@ public class ReceiptEntry {
   Double entryGross;
 
   public ReceiptEntry() {
+    UUID.randomUUID().toString();
   }
 
   public ReceiptEntry(String entryName, Double entryQuantity, String entryUnit, Double entryNetUnitPrice, Double entryNet, String entryVatKey, Double entryVat, Double entryGross) {
+    this.uuid = UUID.randomUUID().toString();
     this.entryName = entryName;
     this.entryQuantity = entryQuantity;
     this.entryUnit = entryUnit;

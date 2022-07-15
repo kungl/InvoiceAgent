@@ -1,14 +1,11 @@
 package hu.csekme.invoiceagent;
-
 import javax.faces.application.ResourceHandler;
-import javax.inject.Inject;
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -21,8 +18,9 @@ public class AuthorizationFilter implements Filter {
 
   private static final String AJAX_REDIRECT_XML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><partial-response><redirect url=\"%s\"></redirect></partial-response>";
   private static final String LOGIN_URL = "/login.xhtml";
-  private static final Logger logger = Logger.getLogger(AuthorizationFilter.class.getName());
   public static final String COOKIE_INVOICE_AGENT = "cookie-invoice-agent";
+
+  private static final Logger logger = Logger.getLogger(AuthorizationFilter.class.getName());
 
   /**
    * @param request  the <code>ServletRequest</code> object contains the client's request

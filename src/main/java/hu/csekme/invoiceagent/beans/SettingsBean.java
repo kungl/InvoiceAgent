@@ -5,6 +5,10 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Named;
 import java.io.Serializable;
 
+/**
+ * Settings bean
+ * @author Krisztián Csekme
+ */
 @Named
 @ApplicationScoped
 public class SettingsBean implements Serializable {

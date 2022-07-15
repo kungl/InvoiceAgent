@@ -63,6 +63,8 @@
                                                  var="entry"
                                                  showGridlines="true"
                                                  resizableColumns="true"
+                                                 rowSelectMode="add"
+                                                 selection="#{receiptBean.selectedEntry}"
                                                  value="#{receiptBean.receipt.receiptEntryList}">
 
                                         <p:column headerText="Megnevezés">
@@ -100,6 +102,17 @@
                                                 <f:convertNumber integerOnly="true"/>
                                             </h:outputText>
                                         </p:column>
+
+                                        <p:column exportable="false">
+                                            <p:commandButton  update="custom"
+                                                    ajax="false" icon="pi pi-trash"
+                                                             action="#{receiptBean.remove}"
+                                                             styleClass="rounded-button ui-button-danger">
+                                                <f:setPropertyActionListener value="#{entry}" target="#{receiptBean.selectedEntry}"/>
+                                                <f:ajax disabled="true"/>
+                                            </p:commandButton>
+                                        </p:column>
+
                                     </p:dataTable>
                                 </p>
 
