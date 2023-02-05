@@ -19,16 +19,16 @@ Application server: JBoss/Wildfly 20.0.1.
 
 ## Installation
 
-Build with Maven
-
-```sh
-$ mvn clean package
-```
-
 ```sh
 # build a custom image
 $ docker build -t invoice-agent:1.0 .
 # run server
 $ docker run -p 8080:8080 invoice-agent:1.0
+```
+
+or use docker-compose:
+
+```sh
+docker-compose up -d --build
 ```
 Address: http://localhost:8080/InvoiceAgent-1.0-SNAPSHOT/login.xhtml
